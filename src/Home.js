@@ -23,7 +23,7 @@ class Home extends Component {
     // this.controls.minAzimuthAngle = 1.0002008289939635
     // this.controls.maxAzimuthAngle = 1.0002008289939635
     this.controls.maxPolarAngle = 1.0341655727265222
-    this.controls.minPolarAngle = 1.0341655727265222
+    this.controls.minPolarAngle = 0.2341655727265222
     this.controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
     this.controls.dampingFactor = 0.05;
     this.controls.screenSpacePanning = false;
@@ -34,7 +34,7 @@ class Home extends Component {
   init = () => {
     this.scene = new THREE.Scene()
     this.scene.background = new THREE.Color(0xeaeaea)
-    // this.scene.fog = new THREE.Fog(0xeaeaea, 500, 10000)
+    this.scene.fog = new THREE.Fog(0xeaeaea, 500, 10000)
     this.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000)
     this.camera.position.set(1000, 500, 2000)
 
@@ -82,7 +82,7 @@ class Home extends Component {
       // bevelSegments: 0
     }
     const material = new THREE.MeshPhongMaterial({ color: 0x000000, specular: 0x666666, emissive: 0xcccccc, shininess: 3, opacity: 0.9, transparent: true })
-    const material2 = new THREE.MeshPhongMaterial({ color: 0x000000, specular: 0x666666, emissive: 0x330000, shininess: 3, opacity: 0.95, transparent: true })
+    const material2 = new THREE.MeshPhongMaterial({ color: 0x000000, specular: 0x666666, emissive: 0x333333, shininess: 3, opacity: 0.95, transparent: true })
 
     const topGeo = []
 
@@ -115,7 +115,7 @@ class Home extends Component {
     const topGeos = BufferGeometryUtils.mergeBufferGeometries(topGeo, false)
     const topMesh = new THREE.Mesh(topGeos, material2);
     topMesh.rotation.x = Math.PI / 2;
-    topMesh.position.y = 1
+    topMesh.position.y = 4
     this.scene.add(topMesh)
     const mergedWallGeometry = BufferGeometryUtils.mergeBufferGeometries(wallGeometries, false)
     const mesh = new THREE.Mesh(mergedWallGeometry, material);
@@ -127,7 +127,7 @@ class Home extends Component {
     const {data} = this.props
     const extrudeSettings = {
       steps: 1,
-      depth: 0.1,
+      depth: 2,
       bevelEnabled: false,
       // bevelThickness: 0,
       // bevelSize: 0,
@@ -150,13 +150,13 @@ class Home extends Component {
     const mergedRoomGeometry = BufferGeometryUtils.mergeBufferGeometries(roomGeometries, false)
     const mesh = new THREE.Mesh(mergedRoomGeometry, material);
     mesh.rotation.x = Math.PI / 2;
-    mesh.position.y = - 249;
+    mesh.position.y = - 245;
     this.scene.add(mesh)
   }
 
   drawMap = () => {
     const groundMaterial = new THREE.MeshBasicMaterial( { color:0x666666 } );
-    const mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 20000, 20000 ), groundMaterial )
+    const mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 60000, 60000 ), groundMaterial )
     mesh.position.y = - 252;
     mesh.rotation.x = - Math.PI / 2;
     mesh.receiveShadow = true;
