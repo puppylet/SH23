@@ -18,7 +18,7 @@ class Home extends Component {
     this.init()
     this.animate()
     this.controls = new MapControls(this.camera, this.renderer.domElement)
-    this.controls.maxDistance = 10000
+    this.controls.maxDistance = 4000
     this.controls.minDistance = 100
     // this.controls.minAzimuthAngle = 1.0002008289939635
     // this.controls.maxAzimuthAngle = 1.0002008289939635
@@ -52,6 +52,7 @@ class Home extends Component {
     const ambientLight = new THREE.AmbientLight(0xcccccc, 0.7)
 
     this.drawWall(group)
+    this.drawRoom()
 
     this.scene.add(ambientLight)
     this.scene.add(directionalLight)
@@ -73,39 +74,90 @@ class Home extends Component {
     const {data} = this.props
     const extrudeSettings = {
       steps: 1,
-      depth: 150,
-      bevelEnabled: true,
-      bevelThickness: 1,
-      bevelSize: 1,
-      bevelOffset: 0,
-      bevelSegments: 1
+      depth: 300,
+      bevelEnabled: false,
+      // bevelThickness: 0,
+      // bevelSize: 0,
+      // bevelOffset: 0,
+      // bevelSegments: 0
     }
     const material = new THREE.MeshPhongMaterial({ color: 0x000000, specular: 0x666666, emissive: 0xcccccc, shininess: 3, opacity: 0.9, transparent: true })
+    const material2 = new THREE.MeshPhongMaterial({ color: 0x000000, specular: 0x666666, emissive: 0x330000, shininess: 3, opacity: 0.95, transparent: true })
+
+    const topGeo = []
 
     const wallGeometries = data.home.wall.map(wall => {
-      console.log(wall)
+      // console.log(wall)
       const {_attributes} = wall
       const shape = new THREE.Shape()
       const xStart = parseFloat(_attributes.xStart)
       const xEnd = parseFloat(_attributes.xEnd)
       const yStart = parseFloat(_attributes.yStart)
       const yEnd = parseFloat(_attributes.yEnd)
-      shape.moveTo( xStart, yStart)
-      shape.lineTo( xEnd, yEnd)
-      shape.lineTo( xEnd, yEnd)
-      shape.lineTo( xStart, yStart)
-      shape.lineTo( xStart, yStart)
-      return new THREE.ExtrudeBufferGeometry( shape, extrudeSettings )
+      const height = parseFloat(_attributes.height)
+      const thickness = parseFloat(_attributes.thickness)
+      const setting = {...extrudeSettings}
+
+      const len = Math.sqrt((xStart - xEnd)* (xStart - xEnd) + (yStart - yEnd) * (yStart - yEnd))
+      const tan = (yStart - yEnd)/(xStart - xEnd)
+      const angle = Math.atan(tan)
+      const deltaX = Math.sin(angle) * thickness / 2
+      const deltaY = Math.cos(angle) * thickness / 2
+
+      shape.moveTo( xStart - deltaX, yStart - deltaY)
+      shape.lineTo( xEnd - deltaX, yEnd - deltaY)
+      shape.lineTo( xEnd + deltaX, yEnd + deltaY)
+      shape.lineTo( xStart + deltaX, yStart + deltaY)
+      shape.lineTo( xStart - deltaX, yStart - deltaY)
+      topGeo.push(new THREE.ExtrudeBufferGeometry( shape, {...setting, depth: 0.1} ))
+      return new THREE.ExtrudeBufferGeometry( shape, setting )
     })
+    const topGeos = BufferGeometryUtils.mergeBufferGeometries(topGeo, false)
+    const topMesh = new THREE.Mesh(topGeos, material2);
+    topMesh.rotation.x = Math.PI / 2;
+    topMesh.position.y = 1
+    this.scene.add(topMesh)
     const mergedWallGeometry = BufferGeometryUtils.mergeBufferGeometries(wallGeometries, false)
     const mesh = new THREE.Mesh(mergedWallGeometry, material);
     group.add(mesh)
   }
 
+  drawRoom = () => {
+    const material = new THREE.MeshPhongMaterial({ color: 0x000000, specular: 0x666666, emissive: 0x999999, shininess: 3, opacity: 0.95, transparent: false })
+    const {data} = this.props
+    const extrudeSettings = {
+      steps: 1,
+      depth: 0.1,
+      bevelEnabled: false,
+      // bevelThickness: 0,
+      // bevelSize: 0,
+      // bevelOffset: 0,
+      // bevelSegments: 0
+    }
+    const roomGeometries = data.home.room.map(room => {
+      console.log(room)
+      const {point} = room
+      const shape = new THREE.Shape()
+      point.map((p, index) => {
+        const x = parseFloat(p._attributes.x)
+        const y = parseFloat(p._attributes.y)
+        if (index === 0) shape.moveTo(x, y)
+        else shape.lineTo(x, y)
+      })
+      return new THREE.ExtrudeBufferGeometry( shape, extrudeSettings )
+    })
+
+    const mergedRoomGeometry = BufferGeometryUtils.mergeBufferGeometries(roomGeometries, false)
+    const mesh = new THREE.Mesh(mergedRoomGeometry, material);
+    mesh.rotation.x = Math.PI / 2;
+    mesh.position.y = - 249;
+    this.scene.add(mesh)
+  }
+
   drawMap = () => {
     const groundMaterial = new THREE.MeshBasicMaterial( { color:0x666666 } );
     const mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 20000, 20000 ), groundMaterial )
-    mesh.position.y = - 250;
+    mesh.position.y = - 252;
     mesh.rotation.x = - Math.PI / 2;
     mesh.receiveShadow = true;
     this.scene.add(mesh)

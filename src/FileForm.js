@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import {xml2js} from 'xml-js'
 import Home from './Home'
+import {data} from './homeData'
 
 class FileForm extends Component {
 
@@ -16,11 +17,19 @@ class FileForm extends Component {
       // console.log('e', e.target.result)
       const text = e.target.result
       const xml = '<home' + text.split('<home')[1].split('</home>')[0] + '</home>'
+      console.log(xml)
       const home = xml2js(xml, {compact: true})
       this.setState({home})
     }
     reader.readAsText(file)
   }
+
+
+  componentDidMount () {
+    const home = xml2js(data, {compact: true})
+    this.setState({home})
+  }
+
 
   render() {
     const {home} = this.state
