@@ -1,3 +1,8 @@
 body {
   margin: 0;
 }
+
+.file-input {
+    position: absolute;
+    z-index: 9999;
+}

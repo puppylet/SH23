@@ -64,9 +64,6 @@ class Home extends Component {
     this.renderer.setPixelRatio(window.devicePixelRatio)
     this.renderer.setSize(window.innerWidth, window.innerHeight)
     this.el.appendChild(this.renderer.domElement)
-    // this.stats = new Stats();
-    // this.el.appendChild(this.stats.dom);
-
     window.addEventListener("resize", this.onWindowResize, false)
   }
 
@@ -81,7 +78,7 @@ class Home extends Component {
       // bevelOffset: 0,
       // bevelSegments: 0
     }
-    const material = new THREE.MeshPhongMaterial({ color: 0x000000, specular: 0x666666, emissive: 0xcccccc, shininess: 3, opacity: 0.9, transparent: true })
+    const material = new THREE.MeshPhongMaterial({ color: 0x000000, specular: 0x666666, emissive: 0xaaaaaa, shininess: 3, opacity: 0.9, transparent: false })
     const material2 = new THREE.MeshPhongMaterial({ color: 0x000000, specular: 0x666666, emissive: 0x333333, shininess: 3, opacity: 0.95, transparent: true })
 
     const topGeo = []
@@ -119,20 +116,17 @@ class Home extends Component {
     this.scene.add(topMesh)
     const mergedWallGeometry = BufferGeometryUtils.mergeBufferGeometries(wallGeometries, false)
     const mesh = new THREE.Mesh(mergedWallGeometry, material);
+    mesh.castShadow = true
     group.add(mesh)
   }
 
   drawRoom = () => {
-    const material = new THREE.MeshPhongMaterial({ color: 0x000000, specular: 0x666666, emissive: 0x999999, shininess: 3, opacity: 0.95, transparent: false })
+    const material = new THREE.MeshPhongMaterial({ color: 0x000000, specular: 0x666666, emissive: 0x777777, shininess: 3, opacity: 0.95, transparent: false })
     const {data} = this.props
     const extrudeSettings = {
       steps: 1,
       depth: 2,
-      bevelEnabled: false,
-      // bevelThickness: 0,
-      // bevelSize: 0,
-      // bevelOffset: 0,
-      // bevelSegments: 0
+      bevelEnabled: false
     }
     const roomGeometries = data.home.room.map(room => {
       console.log(room)
@@ -151,11 +145,12 @@ class Home extends Component {
     const mesh = new THREE.Mesh(mergedRoomGeometry, material);
     mesh.rotation.x = Math.PI / 2;
     mesh.position.y = - 245;
+    mesh.receiveShadow = true
     this.scene.add(mesh)
   }
 
   drawMap = () => {
-    const groundMaterial = new THREE.MeshBasicMaterial( { color:0x666666 } );
+    const groundMaterial = new THREE.MeshBasicMaterial( { color:0xcccccc } );
     const mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 60000, 60000 ), groundMaterial )
     mesh.position.y = - 252;
     mesh.rotation.x = - Math.PI / 2;

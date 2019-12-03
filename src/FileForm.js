@@ -6,11 +6,13 @@ import {data} from './homeData'
 class FileForm extends Component {
 
   state = {
-    home: null
+    home: null, homeKey: Math.random()
   }
 
   handleFileChange = e => {
+    this.setState({home: null, homeKey: Math.random()})
     const file = e.target.files[0]
+    if (!file) return
     let reader = new FileReader()
     reader.onloadend = e => {
       // console.log('file', file)
@@ -19,7 +21,7 @@ class FileForm extends Component {
       const xml = '<home' + text.split('<home')[1].split('</home>')[0] + '</home>'
       console.log(xml)
       const home = xml2js(xml, {compact: true})
-      this.setState({home})
+      this.setState({home, homeKey: Math.random()})
     }
     reader.readAsText(file)
   }
@@ -33,10 +35,10 @@ class FileForm extends Component {
 
   render() {
     const {home} = this.state
-    if (home) return <Home data={home} />
     return (
       <div>
-        <input type='file' onChange={this.handleFileChange}/>
+        <input className='file-input' type='file' onChange={this.handleFileChange}/>
+        {home && <Home data={home} />}
       </div>
     )
   }
