@@ -2,6 +2,7 @@ import React, {Component} from 'react'
 import * as THREE from 'three'
 import {MapControls} from 'three/examples/jsm/controls/OrbitControls'
 import { BufferGeometryUtils } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 
 class Home extends Component {
 
@@ -53,6 +54,8 @@ class Home extends Component {
 
     this.drawWall(group)
     this.drawRoom()
+    this.drawCamera(group)
+    this.drawDoor()
 
     this.scene.add(ambientLight)
     this.scene.add(directionalLight)
@@ -78,7 +81,7 @@ class Home extends Component {
       // bevelOffset: 0,
       // bevelSegments: 0
     }
-    const material = new THREE.MeshPhongMaterial({ color: 0x000000, specular: 0x666666, emissive: 0xaaaaaa, shininess: 3, opacity: 0.9, transparent: false })
+    const material = new THREE.MeshPhongMaterial({ color: 0x000000, specular: 0x666666, emissive: 0xaaaaaa, shininess: 3, opacity: 0.95, transparent: true })
     const material2 = new THREE.MeshPhongMaterial({ color: 0x000000, specular: 0x666666, emissive: 0x333333, shininess: 3, opacity: 0.95, transparent: true })
 
     const topGeo = []
@@ -106,18 +109,77 @@ class Home extends Component {
       shape.lineTo( xEnd + deltaX, yEnd + deltaY)
       shape.lineTo( xStart + deltaX, yStart + deltaY)
       shape.lineTo( xStart - deltaX, yStart - deltaY)
-      topGeo.push(new THREE.ExtrudeBufferGeometry( shape, {...setting, depth: 0.1} ))
+      topGeo.push(new THREE.ExtrudeBufferGeometry( shape, {...setting, depth: 2} ))
       return new THREE.ExtrudeBufferGeometry( shape, setting )
     })
     const topGeos = BufferGeometryUtils.mergeBufferGeometries(topGeo, false)
     const topMesh = new THREE.Mesh(topGeos, material2);
     topMesh.rotation.x = Math.PI / 2;
-    topMesh.position.y = 4
+    topMesh.position.y = 2
     this.scene.add(topMesh)
     const mergedWallGeometry = BufferGeometryUtils.mergeBufferGeometries(wallGeometries, false)
     const mesh = new THREE.Mesh(mergedWallGeometry, material);
     mesh.castShadow = true
     group.add(mesh)
+  }
+
+  drawCamera = group => {
+    const {data} = this.props
+    const cameras = data.home.pieceOfFurniture.map(camera => camera._attributes).filter(camera => camera.name === 'camera')
+    const cameraMaterials = [
+      new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x999999, emissive: 0x000000, shininess: 3, opacity: 1, transparent: false }),
+      new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x999999, emissive: 0x666666, shininess: 3, opacity: 1, transparent: false }),
+      new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x999999, emissive: 0x333333, shininess: 3, opacity: 1, transparent: false }),
+      new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x999999, emissive: 0x1133055, shininess: 3, opacity: 1, transparent: false }),
+    ]
+    const objLoader = new OBJLoader()
+    objLoader.load('camera.obj', object => {
+        let i = 0
+        object.traverse(child => {
+          if (child.isMesh) {
+            child.material = cameraMaterials[i]
+            i++
+          }
+        })
+        const cameraRangeGeometry = new THREE.CylinderBufferGeometry( 0, 120, 300, 400, 4 );
+        const cameraRangeMaterial = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x999999, emissive: 0x3377CC, shininess: 3, opacity: 0.15, transparent: true } )
+        const cameraRange = new THREE.Mesh( cameraRangeGeometry, cameraRangeMaterial );
+        cameraRange.rotateX(-Math.PI/2)
+        cameraRange.rotateY(Math.PI/4)
+        // cameraRange.position.y = -73
+        cameraRange.position.z = 105
+        cameraRange.scale.set(0.7,0.7,0.7)
+
+
+
+        const cameraGroup = new THREE.Group()
+        cameraGroup.add(object)
+        cameraGroup.add(cameraRange)
+        cameraGroup.scale.set(3,3,3)
+        cameraGroup.rotateX(-Math.PI/2)
+
+
+        cameras.map(camera => {
+          const mesh = cameraGroup.clone()
+          mesh.position.x = camera.x
+          mesh.position.y = camera.y
+          mesh.position.z = 245 - parseFloat(camera.elevation)
+
+          mesh.rotateY(-camera.angle)
+          mesh.rotateX(0.72)
+          group.add(mesh)
+        })
+        // group.add( object )
+      },
+      xhr => console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' ),
+      error => console.log( 'An error happened', error)
+    )
+    console.log('cameras', cameras)
+  }
+
+  drawDoor = () => {
+    const {data} = this.props
+    console.log(data.home.doorOrWindow.map(door => door._attributes))
   }
 
   drawRoom = () => {
@@ -129,7 +191,7 @@ class Home extends Component {
       bevelEnabled: false
     }
     const roomGeometries = data.home.room.map(room => {
-      console.log(room)
+      // console.log(room)
       const {point} = room
       const shape = new THREE.Shape()
       point.map((p, index) => {
