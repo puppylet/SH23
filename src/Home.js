@@ -3,7 +3,8 @@ import * as THREE from 'three'
 import {MapControls} from 'three/examples/jsm/controls/OrbitControls'
 import { BufferGeometryUtils } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
-
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { Vector2, Path } from 'three'
 class Home extends Component {
 
   constructor(props) {
@@ -40,7 +41,6 @@ class Home extends Component {
     this.camera.position.set(1000, 500, 2000)
 
     this.drawMap()
-
     const group = new THREE.Group()
     group.rotateX(Math.PI/2);
 
@@ -55,7 +55,7 @@ class Home extends Component {
     this.drawWall(group)
     this.drawRoom()
     this.drawCamera(group)
-    this.drawDoor()
+    this.drawWallItems(group)
 
     this.scene.add(ambientLight)
     this.scene.add(directionalLight)
@@ -119,6 +119,20 @@ class Home extends Component {
     this.scene.add(topMesh)
     const mergedWallGeometry = BufferGeometryUtils.mergeBufferGeometries(wallGeometries, false)
     const mesh = new THREE.Mesh(mergedWallGeometry, material);
+    // const ThreeBSP = window.ThreeBSP
+    // console.log('three', ThreeBSP)
+    // var totalBSP = new ThreeBSP(mesh);
+    // data.home.doorOrWindow.forEach(item => {
+    //   const {_attributes: {x, y, width, height}} = item
+    //   var holeGeometry = new THREE.BoxGeometry(width, height, 300);
+    //   var holeCube = new THREE.Mesh( holeGeometry); 
+    //   holeCube.position.x = x;
+    //   holeCube.position.y = y + height/2;
+    //   holeCube.position.z = 240;
+    //   var clipBSP = new ThreeBSP(holeCube);
+    // //   var resultBSP = totalBSP.subtract(clipBSP)
+    // //   mesh = resultBSP.toMesh();
+    // })
     mesh.castShadow = true
     group.add(mesh)
   }
@@ -218,6 +232,29 @@ class Home extends Component {
     mesh.rotation.x = - Math.PI / 2;
     mesh.receiveShadow = true;
     this.scene.add(mesh)
+  }
+
+  drawWallItems = (group) => {
+    const { data: {home: {doorOrWindow}} } = this.props
+    // console.log("doorOrWindow", doorOrWindow)
+    const loader = new GLTFLoader().setPath('models/')
+    loader.load('doorway.glb', gltf => {
+      gltf.scene.scale.set(180, 180, 100)
+
+      gltf.scene.rotateX(-Math.PI/2)
+      // group.add(gltf.scene)
+      doorOrWindow.forEach(item => {
+        console.log('item', item)
+        // gltf.scene.position.set()
+        const cloneScene = gltf.scene.clone()
+        // console.log(cloneScene)
+        cloneScene.rotateY(item._attributes.angle)
+        cloneScene.position.set(item._attributes.x, item._attributes.y, 240)
+        group.add(cloneScene)
+
+      })
+      // this.scene.add(gltf.scene)
+    })
   }
 
   onWindowResize = () => {
