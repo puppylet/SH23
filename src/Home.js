@@ -30,12 +30,13 @@ class Home extends Component {
     // this.controls.minAzimuthAngle = 1.0002008289939635
     // this.controls.maxAzimuthAngle = 1.0002008289939635
     this.controls.maxPolarAngle = 1.0341655727265222
-    this.controls.minPolarAngle = 0.2341655727265222
+    this.controls.minPolarAngle = 1.0341655727265222
+    // this.controls.minPolarAngle = 0.2341655727265222
     this.controls.enableDamping = true // an animation loop is required when either damping or auto-rotation are enabled
     this.controls.dampingFactor = 0.05
     this.controls.screenSpacePanning = false
-    this.controls.position0 = {x: 1276.8817930944774, y: 671.3467202946568, z: 1668.983819411475}
-    this.controls.target0 = {x: 327.0909146248481, y: 1.2788138680369656e-14, z: 1059.3994616137588}
+    // this.controls.position0 = {x: 1276.8817930944774, y: 671.3467202946568, z: 1668.983819411475}
+    // this.controls.target0 = {x: 327.0909146248481, y: 1.2788138680369656e-14, z: 1059.3994616137588}
   }
 
   init = () => {
