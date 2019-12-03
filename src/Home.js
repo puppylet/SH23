@@ -2,9 +2,13 @@ import React, {Component} from 'react'
 import * as THREE from 'three'
 import {MapControls} from 'three/examples/jsm/controls/OrbitControls'
 import { BufferGeometryUtils } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
+import { GeometryUtils } from 'three/examples/jsm/utils/GeometryUtils.js'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { Vector2, Path } from 'three'
+const ThreeBSP = require('three-js-csg')(THREE);
+
+
 class Home extends Component {
 
   constructor(props) {
@@ -55,7 +59,8 @@ class Home extends Component {
     this.drawWall(group)
     this.drawRoom()
     this.drawCamera(group)
-    this.drawWallItems(group)
+    // this.drawWallItems(group)
+    // this.drawExample()
 
     this.scene.add(ambientLight)
     this.scene.add(directionalLight)
@@ -81,11 +86,11 @@ class Home extends Component {
       // bevelOffset: 0,
       // bevelSegments: 0
     }
-    const material = new THREE.MeshPhongMaterial({ color: 0x000000, specular: 0x666666, emissive: 0xaaaaaa, shininess: 3, opacity: 0.95, transparent: true })
-    const material2 = new THREE.MeshPhongMaterial({ color: 0x000000, specular: 0x666666, emissive: 0x333333, shininess: 3, opacity: 0.95, transparent: true })
+    const material = new THREE.MeshPhongMaterial({ color: 0x000000, specular: 0x666666, emissive: 0xaaaaaa, shininess: 3, opacity: 0.95, transparent: false })
+    const material2 = new THREE.MeshPhongMaterial({ color: 0x000000, specular: 0x666666, emissive: 0x333333, shininess: 3, opacity: 0.95, transparent: false })
 
     const topGeo = []
-
+    let mergedGeo = new THREE.Geometry()
     const wallGeometries = data.home.wall.map(wall => {
       // console.log(wall)
       const {_attributes} = wall
@@ -110,6 +115,7 @@ class Home extends Component {
       shape.lineTo( xStart + deltaX, yStart + deltaY)
       shape.lineTo( xStart - deltaX, yStart - deltaY)
       topGeo.push(new THREE.ExtrudeBufferGeometry( shape, {...setting, depth: 2} ))
+      mergedGeo.merge(new THREE.ExtrudeGeometry( shape, setting ))
       return new THREE.ExtrudeBufferGeometry( shape, setting )
     })
     const topGeos = BufferGeometryUtils.mergeBufferGeometries(topGeo, false)
@@ -119,22 +125,39 @@ class Home extends Component {
     this.scene.add(topMesh)
     const mergedWallGeometry = BufferGeometryUtils.mergeBufferGeometries(wallGeometries, false)
     const mesh = new THREE.Mesh(mergedWallGeometry, material);
-    // const ThreeBSP = window.ThreeBSP
-    // console.log('three', ThreeBSP)
-    // var totalBSP = new ThreeBSP(mesh);
+
+    let mesh2 = new THREE.Mesh(mergedGeo, material)
+    var totalBSP = new ThreeBSP(mesh2);
+    var holeGeometry = new THREE.BoxGeometry(91, 208, 10);
+    var holeCube = new THREE.Mesh( holeGeometry); 
+      holeCube.rotateX(- Math.PI / 2)
+      holeCube.rotateY(1.5707964)
+      holeCube.position.x = 83.046234;
+      holeCube.position.y = 611.91895 + (611.91895)/2;
+      holeCube.position.z = 240;
+      group.add(holeCube)
+    // let mesh3
     // data.home.doorOrWindow.forEach(item => {
-    //   const {_attributes: {x, y, width, height}} = item
-    //   var holeGeometry = new THREE.BoxGeometry(width, height, 300);
+    //   const {_attributes: {x, y, width, height, angle}} = item
+    //   var holeGeometry = new THREE.BoxGeometry(width, height, 10);
     //   var holeCube = new THREE.Mesh( holeGeometry); 
+    //   console.log('hole cube', holeCube)
+    //   holeCube.rotateX(- Math.PI / 2)
+    //   holeCube.rotateY(angle)
     //   holeCube.position.x = x;
     //   holeCube.position.y = y + height/2;
     //   holeCube.position.z = 240;
     //   var clipBSP = new ThreeBSP(holeCube);
-    // //   var resultBSP = totalBSP.subtract(clipBSP)
-    // //   mesh = resultBSP.toMesh();
+    //   var resultBSP = totalBSP.subtract(clipBSP)
+    //   mesh3 = resultBSP.toMesh( new THREE.MeshLambertMaterial({
+    //     shading: THREE.SmoothShading,
+    //     map: new THREE.TextureLoader().load('texture.png')
+    //   }));
+    //   group.add(holeCube)
+    //   group.add(mesh3)
     // })
     mesh.castShadow = true
-    group.add(mesh)
+    group.add(mesh2)
   }
 
   drawCamera = group => {
@@ -244,7 +267,7 @@ class Home extends Component {
       gltf.scene.rotateX(-Math.PI/2)
       // group.add(gltf.scene)
       doorOrWindow.forEach(item => {
-        console.log('item', item)
+        // console.log('item', item)
         // gltf.scene.position.set()
         const cloneScene = gltf.scene.clone()
         // console.log(cloneScene)
@@ -255,6 +278,26 @@ class Home extends Component {
       })
       // this.scene.add(gltf.scene)
     })
+  }
+
+  drawExample = () => {
+    var cube_geometry = new THREE.CubeGeometry( 3, 3, 3 );
+		var cube_mesh = new THREE.Mesh( cube_geometry );
+		cube_mesh.position.x = -7;
+		var cube_bsp = new ThreeBSP( cube_mesh );
+		var sphere_geometry = new THREE.SphereGeometry( 1.8, 32, 32 );
+		var sphere_mesh = new THREE.Mesh( sphere_geometry );
+		sphere_mesh.position.x = -7;
+		var sphere_bsp = new ThreeBSP( sphere_mesh );
+		
+		var subtract_bsp = cube_bsp.subtract( sphere_bsp );
+		var result = subtract_bsp.toMesh( new THREE.MeshLambertMaterial({
+			shading: THREE.SmoothShading,
+			map: new THREE.TextureLoader().load('texture.png')
+		}));
+    result.geometry.computeVertexNormals();
+    result.scale.set(300, 300, 300)
+		this.scene.add( result );
   }
 
   onWindowResize = () => {
