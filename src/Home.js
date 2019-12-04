@@ -2,10 +2,8 @@ import React, {Component} from 'react'
 import * as THREE from 'three'
 import {MapControls} from 'three/examples/jsm/controls/OrbitControls'
 import {BufferGeometryUtils} from 'three/examples/jsm/utils/BufferGeometryUtils.js'
-import {GeometryUtils} from 'three/examples/jsm/utils/GeometryUtils.js'
 import {OBJLoader} from 'three/examples/jsm/loaders/OBJLoader.js'
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js'
-import {Vector2, Path} from 'three'
 
 const ThreeBSP = require('three-js-csg')(THREE)
 
@@ -62,7 +60,6 @@ class Home extends Component {
     this.drawRoom()
     this.drawCamera(group)
     // this.drawWallItems(group)
-    // this.drawExample()
 
     this.scene.add(ambientLight)
     this.scene.add(directionalLight)
@@ -144,33 +141,9 @@ class Home extends Component {
     const mesh = new THREE.Mesh(mergedWallGeometry, material)
 
     let mesh2 = new THREE.Mesh(mergedGeo, material)
-    // const totalBSP = new ThreeBSP(mesh2)
-    // const holeGeometry = new THREE.BoxGeometry(91, 208, 30)
-    // const holeCube = new THREE.Mesh(holeGeometry)
-    // holeCube.rotateX(-Math.PI / 2)
-    // holeCube.rotateY(1.5707964)
-    // holeCube.position.x = 315.046234
-    // holeCube.position.y = 611.91895 + (611.91895) / 2
-    // holeCube.position.z = 240
-    // const clipBSP = new ThreeBSP(holeCube)
-    // const resultBSP = totalBSP.subtract(clipBSP)
-    // const mesh3 = resultBSP.toMesh(material);
-    // console.log('mes3', mesh3)
-    // group.add(mesh3)
-    // const totalBSP2 = new ThreeBSP(mesh3)
-    // console.log('tota', totalBSP2)
-    // group.add(holeCube)
-    
-    // let mesh3
 
-    // let totalBSP = null
-
-    let result = mesh2
-
-    for (let index = 0; index < data.home.doorOrWindow.length; index++) {
-      const item = data.home.doorOrWindow[index]
-      const totalBSP = new ThreeBSP(result)
-      console.log('totl', totalBSP)
+    let totalBSP = new ThreeBSP(mesh2)
+    data.home.doorOrWindow && data.home.doorOrWindow.forEach((item, index) => {
       const {_attributes: hole} = item
       const x = parseFloat(hole.x, 10)
       const y = parseFloat(hole.y, 10)
@@ -178,46 +151,18 @@ class Home extends Component {
       const height = parseFloat(hole.height, 10)
       const depth = parseFloat(hole.depth, 10)
       const angle = parseFloat(hole.angle, 10)
-      const holeGeometry = new THREE.BoxGeometry(width, height, depth + 10)
-      let holeCube = new THREE.Mesh(holeGeometry, new THREE.MeshBasicMaterial({color: 0x559398}))
+      const holeGeometry = new THREE.BoxGeometry(width, height, depth + 20)
+      const holeCube = new THREE.Mesh(holeGeometry, new THREE.MeshBasicMaterial({color: 0x559398}))
       holeCube.rotateX(-Math.PI / 2)
       holeCube.rotateY(angle)
       holeCube.position.x = x
       holeCube.position.y = y
       holeCube.position.z = 140
       const doorHole = new ThreeBSP(holeCube)
-      const resultBSP = totalBSP.subtract(doorHole)
-      console.log('mesh', resultBSP.toMesh(material))
-      result = resultBSP.toMesh(material)
-    }
-
-    // data.home.doorOrWindow && data.home.doorOrWindow.forEach((item, index) => {
-    //   console.log('item',index, item)
-    //   console.log('rsult', result)
-    //   var totalBSP = new ThreeBSP(result)
-    //   console.log('totl', totalBSP)
-    //   const {_attributes: {x, y, width, height, angle, depth}} = item
-    //   const holeGeometry = new THREE.BoxGeometry(width, height, depth)
-    //   const holeCube = new THREE.Mesh(holeGeometry, new THREE.MeshBasicMaterial({color: 0x559398}))
-    //   holeCube.rotateX(-Math.PI / 2)
-    //   holeCube.rotateY(angle)
-    //   holeCube.position.x = x
-    //   holeCube.position.y = y
-    //   holeCube.position.z = 140
-    //   const doorHole = new ThreeBSP(holeCube)
-    //   const resultBSP = totalBSP.subtract(doorHole)
-    //   result = resultBSP.toMesh(material)
-
-    //   // totalBSP = totalBSP.subtract(doorHole)
-    //   // mesh3 = resultBSP.toMesh(material)
-    //   // mesh2 = resultBSP.toMesh()
-    //   // console.log("resultBSP", resultBSP.toMesh())
-    //   // const test = new ThreeBSP(resultBSP.toMesh())
-    //   // console.log('test', test)
-    // //   group.add(holeCube)
-    // //   // group.add(mesh3)
-    // })
-    group.add(result)
+      totalBSP = totalBSP.subtract(doorHole)
+    })
+    const newMesh = totalBSP.toMesh(material)
+    group.add(newMesh)
   }
 
   drawCamera = group => {
@@ -365,42 +310,25 @@ class Home extends Component {
     // console.log("doorOrWindow", doorOrWindow)
     const loader = new GLTFLoader().setPath('models/')
     loader.load('doorway.glb', gltf => {
-      gltf.scene.scale.set(180, 180, 100)
-
       gltf.scene.rotateX(-Math.PI / 2)
-      // group.add(gltf.scene)
+      const box = new THREE.Box3().setFromObject(gltf.scene)
       doorOrWindow.forEach(item => {
-        // console.log('item', item)
-        // gltf.scene.position.set()
         const cloneScene = gltf.scene.clone()
-        // console.log(cloneScene)
-        cloneScene.rotateY(item._attributes.angle)
-        cloneScene.position.set(item._attributes.x, item._attributes.y, 240)
+        console.log('cone secen', cloneScene)
+        const {_attributes: data} = item
+        const x = parseFloat(data.x)
+        const y = parseFloat(data.y)
+        const width = parseFloat(data.width)
+        const height = parseFloat(data.height)
+        const depth = parseFloat(data.depth)
+        const angle = parseFloat(data.angle)
+        cloneScene.scale.set(width/(box.max.x - box.min.x), height/((box.max.z - box.min.z)*1), depth/(box.max.y - box.min.y))
+        cloneScene.rotateY(angle)
+        cloneScene.position.set(x, y, 140)
         group.add(cloneScene)
 
       })
-      // this.scene.add(gltf.scene)
     })
-  }
-
-  drawExample = () => {
-    var cube_geometry = new THREE.CubeGeometry(3, 3, 3)
-    var cube_mesh = new THREE.Mesh(cube_geometry)
-    cube_mesh.position.x = -7
-    var cube_bsp = new ThreeBSP(cube_mesh)
-    var sphere_geometry = new THREE.SphereGeometry(1.8, 32, 32)
-    var sphere_mesh = new THREE.Mesh(sphere_geometry)
-    sphere_mesh.position.x = -5
-    var sphere_bsp = new ThreeBSP(sphere_mesh)
-
-    var subtract_bsp = cube_bsp.subtract(sphere_bsp)
-    var result = subtract_bsp.toMesh(new THREE.MeshLambertMaterial({
-      shading: THREE.SmoothShading,
-      map: new THREE.TextureLoader().load('texture.png')
-    }))
-    result.geometry.computeVertexNormals()
-    result.scale.set(300, 300, 300)
-    this.scene.add(result)
   }
 
   onWindowResize = () => {
