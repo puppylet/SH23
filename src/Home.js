@@ -3,9 +3,10 @@ import * as THREE from 'three'
 import {MapControls} from 'three/examples/jsm/controls/OrbitControls'
 import {BufferGeometryUtils} from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import {OBJLoader} from 'three/examples/jsm/loaders/OBJLoader.js'
+import {SVGLoader} from 'three/examples/jsm/loaders/SVGLoader.js'
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js';
-			
+
 const ThreeBSP = require('three-js-csg')(THREE)
 
 
@@ -146,7 +147,8 @@ class Home extends Component {
     // make holes in the walls
     const manager = new THREE.LoadingManager()
     const mtlLoader = new MTLLoader( manager )
-    const objLoader = new OBJLoader( manager ) 
+    const objLoader = new OBJLoader( manager )
+    const svgLoader = new SVGLoader()
     mtlLoader.load('models/obj/Door/door.mtl', materials => {
       materials.preload();
       objLoader
@@ -156,13 +158,16 @@ class Home extends Component {
           doorObject.rotateX(-Math.PI/2)
           doorObject.children[2].material = new THREE.MeshBasicMaterial({color: 0x999999})
 
-          objLoader.load('Lock/lock.obj', lockModel => {
-            console.log('lock', lockModel)
-            lockModel.scale.set(5, 5, 5)
-            lockModel.rotateX(-Math.PI/2)
-            // group.add(lockModel)
-  
-            // make holes wall
+          svgLoader.load( 'lock.svg', ( svgData ) => {
+            const path = svgData.paths[0]
+            const shape = path.toShapes(false)
+            const svgGeometry = new THREE.ExtrudeBufferGeometry(shape, {depth: 150, bevelEnabled: false,})
+            const svgMesh = new THREE.Mesh(svgGeometry, new THREE.MeshBasicMaterial({color: 0x990000}))
+            svgMesh.rotateX(Math.PI)
+            svgMesh.scale.set(0.05, 0.05, 0.05)
+            // this.scene.add( svgMesh );
+
+
             let mesh2 = new THREE.Mesh(mergedGeo, material)
             let totalBSP = new ThreeBSP(mesh2)
             data.home.doorOrWindow && data.home.doorOrWindow.forEach((item, index) => {
@@ -181,36 +186,39 @@ class Home extends Component {
               holeCube.position.x = x
               holeCube.position.y = y
               holeCube.position.z = 140
-  
-  
+
+
               const cloneDoorObject = doorObject.clone()
-              const cloneLockModel = lockModel.clone()
+              const cloneLockModel = svgMesh.clone()
               const groupTemp = new THREE.Group()
               groupTemp.rotateX(-Math.PI / 2)
               groupTemp.rotateY(-angle || 0)
               groupTemp.position.x = x
               groupTemp.position.y = y
               groupTemp.position.z = 140
-              groupTemp.add(holeCube2)
+              // groupTemp.add(holeCube2)
               groupTemp.add(cloneDoorObject)
-              if (index % 2 === 0) {
+              if (index % 3 === 0) {
                 cloneDoorObject.children[0].rotateZ(-Math.PI/3)
                 cloneDoorObject.children[0].translateY(-45)
                 cloneDoorObject.children[0].translateX(30)
-  
+
                 cloneDoorObject.children[1].rotateZ(-Math.PI/3)
                 cloneDoorObject.children[1].translateY(-45)
                 cloneDoorObject.children[1].translateX(30)
-  
+
                 cloneDoorObject.children[3].rotateZ(-Math.PI/3)
                 cloneDoorObject.children[3].translateY(-45)
                 cloneDoorObject.children[3].translateX(30)
               }
-              cloneLockModel.translateX(Math.sin(-angle) * width/2)
-              cloneLockModel.translateZ(Math.cos(angle) * width/2)
-              groupTemp.add(cloneLockModel)
+              else if(index % 5 === 0) {
+                cloneLockModel.translateX(-10)
+                cloneLockModel.translateZ(-3)
+                groupTemp.add(cloneLockModel)
+              }
+
               group.add(groupTemp)
-  
+
               const doorHole = new ThreeBSP(holeCube)
               const subtractBSP = totalBSP.subtract(doorHole)
               if (subtractBSP.tree.polygons.length) {
@@ -221,6 +229,7 @@ class Home extends Component {
             group.add(newMesh)
             // make holes in the walls
           })
+
         });
     })
 
