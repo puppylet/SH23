@@ -29,7 +29,7 @@ class LoginForm extends Component {
   }
 
   render () {
-    const {error, isLoading, email, password} = this.state
+    const {error, email, password} = this.state
     return (
       <div className='login'>
         <form className='login-form' autoComplete='new-password' >

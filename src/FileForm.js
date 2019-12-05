@@ -19,7 +19,7 @@ class FileForm extends Component {
       // console.log('file', file)
       // console.log('e', e.target.result)
       const text = e.target.result
-      const xml = '<home' + text.split('<home')[1].split('</home>')[0] + '</home>'.replace(/[^\x00-\x7F]+/, '')
+      const xml = '<home' + text.split('<home')[1].split('</home>')[0] + '</home>'
       console.log(xml)
       const home = xml2js(xml, {compact: true})
       console.log('home', home)
