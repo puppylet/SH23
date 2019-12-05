@@ -4,7 +4,8 @@ import {MapControls} from 'three/examples/jsm/controls/OrbitControls'
 import {BufferGeometryUtils} from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import {OBJLoader} from 'three/examples/jsm/loaders/OBJLoader.js'
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js'
-
+import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js';
+			
 const ThreeBSP = require('three-js-csg')(THREE)
 
 
@@ -60,6 +61,7 @@ class Home extends Component {
     this.drawRoom()
     this.drawCamera(group)
     // this.drawWallItems(group)
+    // this.drawExample(group)
 
     this.scene.add(ambientLight)
     this.scene.add(directionalLight)
@@ -140,29 +142,88 @@ class Home extends Component {
     const mergedWallGeometry = BufferGeometryUtils.mergeBufferGeometries(wallGeometries, false)
     const mesh = new THREE.Mesh(mergedWallGeometry, material)
 
-    let mesh2 = new THREE.Mesh(mergedGeo, material)
 
-    let totalBSP = new ThreeBSP(mesh2)
-    data.home.doorOrWindow && data.home.doorOrWindow.forEach((item, index) => {
-      const {_attributes: hole} = item
-      const x = parseFloat(hole.x, 10)
-      const y = parseFloat(hole.y, 10)
-      const width = parseFloat(hole.width, 10)
-      const height = parseFloat(hole.height, 10)
-      const depth = parseFloat(hole.depth, 10)
-      const angle = parseFloat(hole.angle, 10)
-      const holeGeometry = new THREE.BoxGeometry(width, height, depth + 20)
-      const holeCube = new THREE.Mesh(holeGeometry, new THREE.MeshBasicMaterial({color: 0x559398}))
-      holeCube.rotateX(-Math.PI / 2)
-      holeCube.rotateY(angle)
-      holeCube.position.x = x
-      holeCube.position.y = y
-      holeCube.position.z = 140
-      const doorHole = new ThreeBSP(holeCube)
-      totalBSP = totalBSP.subtract(doorHole)
+    // make holes in the walls
+    const manager = new THREE.LoadingManager()
+    const mtlLoader = new MTLLoader( manager )
+    const objLoader = new OBJLoader( manager ) 
+    mtlLoader.load('models/obj/Door/door.mtl', materials => {
+      materials.preload();
+      objLoader
+        .setMaterials( materials )
+        .setPath( 'models/obj/' )
+        .load( 'Door/door.obj', doorObject => {
+          doorObject.rotateX(-Math.PI/2)
+          doorObject.children[2].material = new THREE.MeshBasicMaterial({color: 0x999999})
+
+          objLoader.load('Lock/lock.obj', lockModel => {
+            console.log('lock', lockModel)
+            lockModel.scale.set(5, 5, 5)
+            lockModel.rotateX(-Math.PI/2)
+            // group.add(lockModel)
+  
+            // make holes wall
+            let mesh2 = new THREE.Mesh(mergedGeo, material)
+            let totalBSP = new ThreeBSP(mesh2)
+            data.home.doorOrWindow && data.home.doorOrWindow.forEach((item, index) => {
+              const {_attributes: hole} = item
+              const x = parseFloat(hole.x, 10)
+              const y = parseFloat(hole.y, 10)
+              const width = parseFloat(hole.width, 10)
+              const height = parseFloat(hole.height, 10)
+              const depth = parseFloat(hole.depth, 10)
+              const angle = parseFloat(hole.angle, 10)
+              const holeGeometry = new THREE.BoxGeometry(width, height, depth + 50)
+              const holeCube = new THREE.Mesh(holeGeometry, new THREE.MeshBasicMaterial({color: 0x559398, transparent: true, opacity: 0.5}))
+              const holeCube2 = new THREE.Mesh(holeGeometry, new THREE.MeshBasicMaterial({color: 0x559398, transparent: true, opacity: 0.5}))
+              holeCube.rotateX(-Math.PI / 2)
+              holeCube.rotateY(-angle || 0)
+              holeCube.position.x = x
+              holeCube.position.y = y
+              holeCube.position.z = 140
+  
+  
+              const cloneDoorObject = doorObject.clone()
+              const cloneLockModel = lockModel.clone()
+              const groupTemp = new THREE.Group()
+              groupTemp.rotateX(-Math.PI / 2)
+              groupTemp.rotateY(-angle || 0)
+              groupTemp.position.x = x
+              groupTemp.position.y = y
+              groupTemp.position.z = 140
+              groupTemp.add(holeCube2)
+              groupTemp.add(cloneDoorObject)
+              if (index % 2 === 0) {
+                cloneDoorObject.children[0].rotateZ(-Math.PI/3)
+                cloneDoorObject.children[0].translateY(-45)
+                cloneDoorObject.children[0].translateX(30)
+  
+                cloneDoorObject.children[1].rotateZ(-Math.PI/3)
+                cloneDoorObject.children[1].translateY(-45)
+                cloneDoorObject.children[1].translateX(30)
+  
+                cloneDoorObject.children[3].rotateZ(-Math.PI/3)
+                cloneDoorObject.children[3].translateY(-45)
+                cloneDoorObject.children[3].translateX(30)
+              }
+              cloneLockModel.translateX(Math.sin(-angle) * width/2)
+              cloneLockModel.translateZ(Math.cos(angle) * width/2)
+              groupTemp.add(cloneLockModel)
+              group.add(groupTemp)
+  
+              const doorHole = new ThreeBSP(holeCube)
+              const subtractBSP = totalBSP.subtract(doorHole)
+              if (subtractBSP.tree.polygons.length) {
+                totalBSP = subtractBSP
+              }
+            })
+            const newMesh = totalBSP.toMesh(material)
+            group.add(newMesh)
+            // make holes in the walls
+          })
+        });
     })
-    const newMesh = totalBSP.toMesh(material)
-    group.add(newMesh)
+
   }
 
   drawCamera = group => {
@@ -329,6 +390,26 @@ class Home extends Component {
 
       })
     })
+  }
+
+  drawExample = (group) => {
+    var geometry = new THREE.BoxBufferGeometry( 100, 100, 10 );
+    var material = new THREE.MeshBasicMaterial( {color: 0x0000ff} );
+    var material2 = new THREE.MeshBasicMaterial( {color: 0xff0000} );
+
+    var cubeA = new THREE.Mesh( geometry, material );
+    cubeA.position.set( 100, 10, 0 );
+
+    var cubeB = new THREE.Mesh( geometry, material2 );
+    cubeB.position.set( 0, 0, 0 );
+
+    //create a group and add the two cubes
+    //These cubes can now be rotated / scaled etc as a group
+    var group1 = new THREE.Group();
+    group1.add( cubeA );
+    group1.add( cubeB );
+    // group.add(group1)
+    this.scene.add(group1)
   }
 
   onWindowResize = () => {
