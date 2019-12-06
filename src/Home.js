@@ -149,18 +149,20 @@ class Home extends Component {
     // make holes in the walls
     const manager = new THREE.LoadingManager()
     const mtlLoader = new MTLLoader( manager )
-    const objLoader = new OBJLoader( manager )
+    const objLoader = new OBJLoader( )
     const svgLoader = new SVGLoader()
-    mtlLoader.load('models/obj/Door/door.mtl', materials => {
+    mtlLoader.load('/models/obj/Door/door.mtl', materials => {
+      console.log('door ,tl;', materials)
       materials.preload();
       objLoader
         .setMaterials( materials )
-        .setPath( 'models/obj/' )
+        .setPath( '/models/obj/' )
         .load( 'Door/door.obj', doorObject => {
+          console.log('door', doorObject)
           doorObject.rotateX(-Math.PI/2)
           doorObject.children[2].material = new THREE.MeshBasicMaterial({color: 0x999999})
 
-          svgLoader.load( 'lock.svg', ( svgData ) => {
+          svgLoader.load( '/lock.svg', ( svgData ) => {
             const path = svgData.paths[0]
             const shape = path.toShapes(false)
             const svgGeometry = new THREE.ExtrudeBufferGeometry(shape, {depth: 150, bevelEnabled: false,})
