@@ -108,8 +108,6 @@ class Home extends Component {
 
     const topGeo = []
     let mergedGeo = new THREE.Geometry()
-    if (!data.home.wall) return
-    if (data.home.wall._attributes) data.home.wall = [data.home.wall]
     const wallGeometries = data.home.wall.map(wall => {
       // console.log(wall)
       const {_attributes} = wall
@@ -118,11 +116,11 @@ class Home extends Component {
       const xEnd = parseFloat(_attributes.xEnd)
       const yStart = parseFloat(_attributes.yStart)
       const yEnd = parseFloat(_attributes.yEnd)
-      // const height = parseFloat(_attributes.height)
+      const height = parseFloat(_attributes.height)
       const thickness = parseFloat(_attributes.thickness)
       const setting = {...extrudeSettings}
 
-      // const len = Math.sqrt((xStart - xEnd) * (xStart - xEnd) + (yStart - yEnd) * (yStart - yEnd))
+      const len = Math.sqrt((xStart - xEnd) * (xStart - xEnd) + (yStart - yEnd) * (yStart - yEnd))
       const tan = (yStart - yEnd) / (xStart - xEnd)
       const angle = Math.atan(tan)
       const deltaX = Math.sin(angle) * thickness / 2
@@ -142,8 +140,8 @@ class Home extends Component {
     topMesh.rotation.x = Math.PI / 2
     topMesh.position.y = 2
     this.scene.add(topMesh)
-    // const mergedWallGeometry = BufferGeometryUtils.mergeBufferGeometries(wallGeometries, false)
-    // const mesh = new THREE.Mesh(mergedWallGeometry, material)
+    const mergedWallGeometry = BufferGeometryUtils.mergeBufferGeometries(wallGeometries, false)
+    const mesh = new THREE.Mesh(mergedWallGeometry, material)
 
 
     // make holes in the walls
@@ -184,7 +182,7 @@ class Home extends Component {
               const angle = parseFloat(hole.angle, 10)
               const holeGeometry = new THREE.BoxGeometry(width, height, depth + 50)
               const holeCube = new THREE.Mesh(holeGeometry, new THREE.MeshBasicMaterial({color: 0x559398, transparent: true, opacity: 0.5}))
-              // const holeCube2 = new THREE.Mesh(holeGeometry, new THREE.MeshBasicMaterial({color: 0x559398, transparent: true, opacity: 0.5}))
+              const holeCube2 = new THREE.Mesh(holeGeometry, new THREE.MeshBasicMaterial({color: 0x559398, transparent: true, opacity: 0.5}))
               holeCube.rotateX(-Math.PI / 2)
               holeCube.rotateY(-angle || 0)
               holeCube.position.x = x
@@ -318,7 +316,7 @@ class Home extends Component {
 
           mesh.rotateY(-camera.angle)
           mesh.rotateX(0.72)
-          return group.add(mesh)
+          group.add(mesh)
         })
         // group.add( object )
       },
@@ -336,7 +334,6 @@ class Home extends Component {
   drawRoom = () => {
     const {data} = this.props
     if (!data.home.room) return
-    if (data.home.room._attributes) data.home.room = [data.home.room]
     const material = new THREE.MeshPhongMaterial({
       color: 0x000000,
       specular: 0x666666,
@@ -359,7 +356,6 @@ class Home extends Component {
         const y = parseFloat(p._attributes.y)
         if (index === 0) shape.moveTo(x, y)
         else shape.lineTo(x, y)
-        return null
       })
       return new THREE.ExtrudeBufferGeometry(shape, extrudeSettings)
     })
