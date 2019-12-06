@@ -126,6 +126,20 @@ class Home extends Component {
       const deltaX = Math.sin(angle) * thickness / 2
       const deltaY = Math.cos(angle) * thickness / 2
 
+      const geometry = new THREE.Geometry();
+      geometry.vertices.push(
+        new THREE.Vector3(xStart - deltaX, 0, yStart - deltaY),
+        new THREE.Vector3(xEnd - deltaX, 0, yEnd - deltaY),
+        new THREE.Vector3(xEnd + deltaX, 0, yEnd + deltaY),
+        new THREE.Vector3(xStart + deltaX, 0, yStart + deltaY),
+        new THREE.Vector3(xStart - deltaX, 30, yStart - deltaY),
+        new THREE.Vector3(xEnd - deltaX, 30, yEnd - deltaY),
+        new THREE.Vector3(xEnd + deltaX, 30, yEnd + deltaY),
+        new THREE.Vector3(xStart + deltaX, 30, yStart + deltaY),
+      )
+      console.log('geometry', geometry)
+
+
       shape.moveTo(xStart - deltaX, yStart - deltaY)
       shape.lineTo(xEnd - deltaX, yEnd - deltaY)
       shape.lineTo(xEnd + deltaX, yEnd + deltaY)
@@ -139,10 +153,13 @@ class Home extends Component {
     const topMesh = new THREE.Mesh(topGeos, material2)
     topMesh.rotation.x = Math.PI / 2
     topMesh.position.y = 2
-    this.scene.add(topMesh)
     const mergedWallGeometry = BufferGeometryUtils.mergeBufferGeometries(wallGeometries, false)
     const mesh = new THREE.Mesh(mergedWallGeometry, material)
+    mesh.rotation.x = Math.PI / 2
+    this.scene.add(topMesh)
+    this.scene.add(mesh)
 
+    if(mesh) return
 
     // make holes in the walls
     const manager = new THREE.LoadingManager()
@@ -373,52 +390,6 @@ class Home extends Component {
     mesh.rotation.x = -Math.PI / 2
     mesh.receiveShadow = true
     this.scene.add(mesh)
-  }
-
-  drawWallItems = (group) => {
-    const {data: {home: {doorOrWindow}}} = this.props
-    // console.log("doorOrWindow", doorOrWindow)
-    const loader = new GLTFLoader().setPath('models/')
-    loader.load('doorway.glb', gltf => {
-      gltf.scene.rotateX(-Math.PI / 2)
-      const box = new THREE.Box3().setFromObject(gltf.scene)
-      doorOrWindow.forEach(item => {
-        const cloneScene = gltf.scene.clone()
-        console.log('cone secen', cloneScene)
-        const {_attributes: data} = item
-        const x = parseFloat(data.x)
-        const y = parseFloat(data.y)
-        const width = parseFloat(data.width)
-        const height = parseFloat(data.height)
-        const depth = parseFloat(data.depth)
-        const angle = parseFloat(data.angle)
-        cloneScene.scale.set(width/(box.max.x - box.min.x), height/((box.max.z - box.min.z)*1), depth/(box.max.y - box.min.y))
-        cloneScene.rotateY(angle)
-        cloneScene.position.set(x, y, 140)
-        group.add(cloneScene)
-
-      })
-    })
-  }
-
-  drawExample = (group) => {
-    var geometry = new THREE.BoxBufferGeometry( 100, 100, 10 );
-    var material = new THREE.MeshBasicMaterial( {color: 0x0000ff} );
-    var material2 = new THREE.MeshBasicMaterial( {color: 0xff0000} );
-
-    var cubeA = new THREE.Mesh( geometry, material );
-    cubeA.position.set( 100, 10, 0 );
-
-    var cubeB = new THREE.Mesh( geometry, material2 );
-    cubeB.position.set( 0, 0, 0 );
-
-    //create a group and add the two cubes
-    //These cubes can now be rotated / scaled etc as a group
-    var group1 = new THREE.Group();
-    group1.add( cubeA );
-    group1.add( cubeB );
-    // group.add(group1)
-    this.scene.add(group1)
   }
 
   onWindowResize = () => {
