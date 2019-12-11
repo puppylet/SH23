@@ -366,8 +366,7 @@ class Home extends Component {
       } );
       const box = new THREE.Box3()
       const roomGeometries = data.home.room.map(room => {
-        // console.log('room', room)
-        const {point, _attributes: {name}} = room
+        const {point, _attributes = {}} = room
         const shape = new THREE.Shape()
         point.map((p, index) => {
           const x = parseFloat(p._attributes.x)
@@ -382,15 +381,18 @@ class Home extends Component {
         box.setFromObject(roomMesh)
         const center = box.getCenter()
 
-        const fontShape = font.generateShapes( name || 'No name', 50 );
+        const fontShape = font.generateShapes( _attributes.name || 'No name', 50 );
 
         const fontGeometry = new THREE.ShapeBufferGeometry(fontShape)
         const text = new THREE.Mesh( fontGeometry, fontMaterial );
-        text.position.x = center.x
-        text.position.z = center.y
+        text.position.x = center.x + (_attributes.nameXOffset ? parseFloat(_attributes.nameXOffset) : 0)
+        text.position.z = center.y + (_attributes.nameYOffset ? parseFloat(_attributes.nameYOffset) : 0)
         text.position.y = -245
         text.rotateX(-Math.PI / 2)
-
+        if (_attributes.nameAngle) {
+          text.rotateZ(parseFloat(_attributes.nameAngle))
+        }
+        
         this.scene.add(text)
         return shapeGeometry
       })
