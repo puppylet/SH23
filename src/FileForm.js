@@ -1,8 +1,8 @@
 import React, {Component} from 'react'
 import {xml2js} from 'xml-js'
 import Home from './Home'
-// import {data} from './homeData'
-import data from './arlingtonData'
+import {data} from './homeData'
+// import data from './arlingtonData'
 
 class FileForm extends Component {
 

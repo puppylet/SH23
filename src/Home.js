@@ -6,6 +6,7 @@ import {OBJLoader} from 'three/examples/jsm/loaders/OBJLoader.js'
 import {SVGLoader} from 'three/examples/jsm/loaders/SVGLoader.js'
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js';
+import stat from 'three/examples/jsm/libs/stats.module.js';
 
 const ThreeBSP = require('three-js-csg')(THREE)
 
@@ -41,6 +42,8 @@ class Home extends Component {
 
   init = () => {
     this.scene = new THREE.Scene()
+    this.stats = new stat()
+    window.document.body.appendChild( this.stats.dom );
     this.scene.background = new THREE.Color(0xeaeaea)
     this.scene.fog = new THREE.Fog(0xeaeaea, 500, 10000)
     this.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000)
@@ -95,7 +98,8 @@ class Home extends Component {
       shininess: 3,
       opacity: 0.95,
       transparent: false,
-      side: THREE.DoubleSide
+      side: THREE.DoubleSide,
+      wireframe: true
     })
     const material2 = new THREE.MeshPhongMaterial({
       color: 0x000000,
@@ -139,7 +143,7 @@ class Home extends Component {
     const topMesh = new THREE.Mesh(topGeos, material2)
     topMesh.rotation.x = Math.PI / 2
     topMesh.position.y = 2
-    this.scene.add(topMesh)
+    // this.scene.add(topMesh)
     const mergedWallGeometry = BufferGeometryUtils.mergeBufferGeometries(wallGeometries, false)
     const mesh = new THREE.Mesh(mergedWallGeometry, material)
 
@@ -171,7 +175,7 @@ class Home extends Component {
 
 
             let mesh2 = new THREE.Mesh(mergedGeo, material)
-            let totalBSP = new ThreeBSP(mesh2)
+            // let totalBSP = new ThreeBSP(mesh2)
             data.home.doorOrWindow && data.home.doorOrWindow.forEach((item, index) => {
               const {_attributes: hole} = item
               const x = parseFloat(hole.x, 10)
@@ -180,55 +184,61 @@ class Home extends Component {
               const height = parseFloat(hole.height, 10)
               const depth = parseFloat(hole.depth, 10)
               const angle = parseFloat(hole.angle, 10)
-              const holeGeometry = new THREE.BoxGeometry(width, height, depth + 50)
-              const holeCube = new THREE.Mesh(holeGeometry, new THREE.MeshBasicMaterial({color: 0x559398, transparent: true, opacity: 0.5}))
-              const holeCube2 = new THREE.Mesh(holeGeometry, new THREE.MeshBasicMaterial({color: 0x559398, transparent: true, opacity: 0.5}))
+              const holeGeometry = new THREE.BoxGeometry(1, 1, 1)
+              const holeCube = new THREE.Mesh(holeGeometry, new THREE.MeshBasicMaterial({color: 0x559398, transparent: false, opacity: 0.5}))
+              // const holeCube2 = new THREE.Mesh(holeGeometry, new THREE.MeshBasicMaterial({color: 0x559398, transparent: true, opacity: 0.5}))
               holeCube.rotateX(-Math.PI / 2)
+              holeCube.scale.set(width - 5, height, depth + 10)
               holeCube.rotateY(-angle || 0)
               holeCube.position.x = x
               holeCube.position.y = y
               holeCube.position.z = 140
+              group.add(holeCube)
+              // const holdeMesh =
 
 
-              const cloneDoorObject = doorObject.clone()
-              const cloneLockModel = svgMesh.clone()
-              const groupTemp = new THREE.Group()
-              groupTemp.rotateX(-Math.PI / 2)
-              groupTemp.rotateY(-angle || 0)
-              groupTemp.position.x = x
-              groupTemp.position.y = y
-              groupTemp.position.z = 140
+              // const cloneDoorObject = doorObject.clone()
+              // const cloneLockModel = svgMesh.clone()
+              // const groupTemp = new THREE.Group()
+              // groupTemp.rotateX(-Math.PI / 2)
+              // groupTemp.rotateY(-angle || 0)
+              // groupTemp.position.x = x
+              // groupTemp.position.y = y
+              // groupTemp.position.z = 140
               // groupTemp.add(holeCube2)
-              groupTemp.add(cloneDoorObject)
-              if (index % 3 === 0) {
-                cloneDoorObject.children[0].rotateZ(-Math.PI/3)
-                cloneDoorObject.children[0].translateY(-45)
-                cloneDoorObject.children[0].translateX(30)
+              // groupTemp.add(cloneDoorObject)
+              // if (index % 3 === 0) {
+              //   cloneDoorObject.children[0].rotateZ(-Math.PI/3)
+              //   cloneDoorObject.children[0].translateY(-45)
+              //   cloneDoorObject.children[0].translateX(30)
+              //
+              //   cloneDoorObject.children[1].rotateZ(-Math.PI/3)
+              //   cloneDoorObject.children[1].translateY(-45)
+              //   cloneDoorObject.children[1].translateX(30)
+              //   cloneDoorObject.children[1].translateX(30)
+              //
+              //   cloneDoorObject.children[3].rotateZ(-Math.PI/3)
+              //   cloneDoorObject.children[3].translateY(-45)
+              //   cloneDoorObject.children[3].translateX(30)
+              // }
+              // else if(index % 5 === 0) {
+              //   cloneLockModel.translateX(-10)
+              //   cloneLockModel.translateZ(-3)
+              //   groupTemp.add(cloneLockModel)
+              // }
 
-                cloneDoorObject.children[1].rotateZ(-Math.PI/3)
-                cloneDoorObject.children[1].translateY(-45)
-                cloneDoorObject.children[1].translateX(30)
+              // group.add(groupTemp)
 
-                cloneDoorObject.children[3].rotateZ(-Math.PI/3)
-                cloneDoorObject.children[3].translateY(-45)
-                cloneDoorObject.children[3].translateX(30)
-              }
-              else if(index % 5 === 0) {
-                cloneLockModel.translateX(-10)
-                cloneLockModel.translateZ(-3)
-                groupTemp.add(cloneLockModel)
-              }
-
-              group.add(groupTemp)
-
-              const doorHole = new ThreeBSP(holeCube)
-              const subtractBSP = totalBSP.subtract(doorHole)
-              if (subtractBSP.tree.polygons.length) {
-                totalBSP = subtractBSP
-              }
+              // const doorHole = new ThreeBSP(holeCube)
+              // const subtractBSP = totalBSP.subtract(doorHole)
+              // if (subtractBSP.tree.polygons.length) {
+              //   totalBSP = subtractBSP
+              // }
             })
-            const newMesh = totalBSP.toMesh(material)
-            group.add(newMesh)
+            // const newMesh = totalBSP.toMesh(material)
+            // group.add(newMesh)
+            group.add(mesh2)
+            // make holes in the walls
             // make holes in the walls
           })
 
@@ -340,6 +350,7 @@ class Home extends Component {
       emissive: 0x777777,
       shininess: 3,
       opacity: 0.95,
+      // wireframe: true,
       transparent: false
     })
     const extrudeSettings = {
@@ -432,6 +443,7 @@ class Home extends Component {
   animate = () => {
     requestAnimationFrame(this.animate)
     this.render3d()
+    this.stats && this.stats.update()
     this.controls && this.controls.update()
   }
 
