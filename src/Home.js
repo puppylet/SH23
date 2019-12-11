@@ -385,22 +385,47 @@ class Home extends Component {
 
         const fontGeometry = new THREE.ShapeBufferGeometry(fontShape)
         const text = new THREE.Mesh( fontGeometry, fontMaterial );
-        text.position.x = center.x + (_attributes.nameXOffset ? parseFloat(_attributes.nameXOffset) : 0)
-        text.position.z = center.y + (_attributes.nameYOffset ? parseFloat(_attributes.nameYOffset) : 0)
-        text.position.y = -245
         text.rotateX(-Math.PI / 2)
         if (_attributes.nameAngle) {
           text.rotateZ(parseFloat(_attributes.nameAngle))
         }
-        
+
+        text.position.x = center.x + (_attributes.nameXOffset ? parseFloat(_attributes.nameXOffset) : 0)
+        text.position.z = center.y + (_attributes.nameYOffset ? parseFloat(_attributes.nameYOffset) : 0)
+        text.position.y = -245
+
+        const textBox  = new THREE.Box3().setFromObject(text)
+
+        const {min, max} = textBox
+        const deltaX = (max.x - min.x) / 2
+        const deltaZ = (max.z - min.z) / 2
+
+        text.position.x = center.x - deltaX + (_attributes.nameXOffset ? parseFloat(_attributes.nameXOffset) : 0)
+        text.position.z = center.y - deltaZ + (_attributes.nameYOffset ? parseFloat(_attributes.nameYOffset) : 0)
+
+        if(_attributes.name === 'West Vestibule') {
+          console.log(_attributes.name )
+          console.log('textBox', textBox)
+          console.log('deltaX', deltaX)
+          console.log('deltaZ', deltaZ)
+          // const boxMesh = new THREE.Box3Helper(textBox, 0xffff00)
+          // this.scene.add(boxMesh)
+        }
+
+
+        // const boxMesh = new THREE.Box3Helper(textBox, 0xffff00)
+        // this.scene.add(boxMesh)
+
+
+
         this.scene.add(text)
         return shapeGeometry
       })
-  
+
       const mergedRoomGeometry = BufferGeometryUtils.mergeBufferGeometries(roomGeometries, false)
       const mesh = new THREE.Mesh(mergedRoomGeometry, material)
       mesh.rotation.x = Math.PI / 2
-      mesh.position.y = -245
+      mesh.position.y = -248
       mesh.receiveShadow = true
       this.scene.add(mesh)
     })
