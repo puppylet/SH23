@@ -99,7 +99,7 @@ class Home extends Component {
       opacity: 0.95,
       transparent: false,
       side: THREE.DoubleSide,
-      wireframe: true
+      // wireframe: true
     })
     const material2 = new THREE.MeshPhongMaterial({
       color: 0x000000,
@@ -344,39 +344,64 @@ class Home extends Component {
   drawRoom = () => {
     const {data} = this.props
     if (!data.home.room) return
-    const material = new THREE.MeshPhongMaterial({
-      color: 0x000000,
-      specular: 0x666666,
-      emissive: 0x777777,
-      shininess: 3,
-      opacity: 0.95,
-      // wireframe: true,
-      transparent: false
-    })
-    const extrudeSettings = {
-      steps: 1,
-      depth: 2,
-      bevelEnabled: false
-    }
-    const roomGeometries = data.home.room.map(room => {
-      // console.log(room)
-      const {point} = room
-      const shape = new THREE.Shape()
-      point.map((p, index) => {
-        const x = parseFloat(p._attributes.x)
-        const y = parseFloat(p._attributes.y)
-        if (index === 0) shape.moveTo(x, y)
-        else shape.lineTo(x, y)
+    const loader = new THREE.FontLoader();
+    loader.load('/fonts/helvetiker_regular.typeface.json', font => {
+      const material = new THREE.MeshPhongMaterial({
+        color: 0x000000,
+        specular: 0x666666,
+        emissive: 0x777777,
+        shininess: 3,
+        opacity: 0.95,
+        // wireframe: true,
+        transparent: false
       })
-      return new THREE.ExtrudeBufferGeometry(shape, extrudeSettings)
-    })
+      const extrudeSettings = {
+        steps: 1,
+        depth: 2,
+        bevelEnabled: false
+      }
+      const fontMaterial = new THREE.LineBasicMaterial( {
+        color: 0x006699,
+        side: THREE.DoubleSide
+      } );
+      const box = new THREE.Box3()
+      const roomGeometries = data.home.room.map(room => {
+        // console.log('room', room)
+        const {point, _attributes: {name}} = room
+        const shape = new THREE.Shape()
+        point.map((p, index) => {
+          const x = parseFloat(p._attributes.x)
+          const y = parseFloat(p._attributes.y)
+          if (index === 0) shape.moveTo(x, y)
+          else shape.lineTo(x, y)
+        })
 
-    const mergedRoomGeometry = BufferGeometryUtils.mergeBufferGeometries(roomGeometries, false)
-    const mesh = new THREE.Mesh(mergedRoomGeometry, material)
-    mesh.rotation.x = Math.PI / 2
-    mesh.position.y = -245
-    mesh.receiveShadow = true
-    this.scene.add(mesh)
+        const shapeGeometry = new THREE.ExtrudeBufferGeometry(shape, extrudeSettings)
+
+        const roomMesh = new THREE.Mesh(shapeGeometry)
+        box.setFromObject(roomMesh)
+        const center = box.getCenter()
+
+        const fontShape = font.generateShapes( name || 'No name', 50 );
+
+        const fontGeometry = new THREE.ShapeBufferGeometry(fontShape)
+        const text = new THREE.Mesh( fontGeometry, fontMaterial );
+        text.position.x = center.x
+        text.position.z = center.y
+        text.position.y = -245
+        text.rotateX(-Math.PI / 2)
+
+        this.scene.add(text)
+        return shapeGeometry
+      })
+  
+      const mergedRoomGeometry = BufferGeometryUtils.mergeBufferGeometries(roomGeometries, false)
+      const mesh = new THREE.Mesh(mergedRoomGeometry, material)
+      mesh.rotation.x = Math.PI / 2
+      mesh.position.y = -245
+      mesh.receiveShadow = true
+      this.scene.add(mesh)
+    })
   }
 
   drawMap = () => {
