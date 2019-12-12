@@ -60,7 +60,7 @@ class Home extends Component {
     const ambientLight = new THREE.AmbientLight(0xcccccc, 0.7)
 
     this.drawWall(group)
-    // this.drawRoom()
+    this.drawRoom(group)
     // this.drawCamera(group)
     // this.drawWallItems(group)
     // this.drawExample(group)
@@ -415,6 +415,9 @@ class Home extends Component {
         side: THREE.DoubleSide
       } );
       const box = new THREE.Box3()
+
+      const singleTextGeometry = new THREE.Geometry()
+
       const roomGeometries = data.home.room.map(room => {
         const {point, _attributes = {}} = room
         const shape = new THREE.Shape()
@@ -427,6 +430,7 @@ class Home extends Component {
 
         const shapeGeometry = new THREE.ExtrudeBufferGeometry(shape, extrudeSettings)
 
+        // draw text
         const roomMesh = new THREE.Mesh(shapeGeometry)
         box.setFromObject(roomMesh)
         const center = box.getCenter()
@@ -442,7 +446,7 @@ class Home extends Component {
 
         const fontShape = font.generateShapes( _attributes.name || '', textSize );
 
-        const fontGeometry = new THREE.ShapeBufferGeometry(fontShape)
+        const fontGeometry = new THREE.ShapeGeometry(fontShape)
         const text = new THREE.Mesh( fontGeometry, fontMaterial );
         text.rotateX(-Math.PI / 2)
         if (_attributes.nameAngle) {
@@ -472,15 +476,21 @@ class Home extends Component {
           // this.scene.add(boxMesh)
         }
 
+        text.updateMatrix()
+        singleTextGeometry.merge(text.geometry, text.matrix)
+
 
         // const boxMesh = new THREE.Box3Helper(textBox, 0xffff00)
         // this.scene.add(boxMesh)
 
 
 
-        this.scene.add(text)
+        // this.scene.add(text)
         return shapeGeometry
       })
+
+      const singleTextMesh = new THREE.Mesh(singleTextGeometry, fontMaterial)
+      this.scene.add(singleTextMesh)
 
       const mergedRoomGeometry = BufferGeometryUtils.mergeBufferGeometries(roomGeometries, false)
       const mesh = new THREE.Mesh(mergedRoomGeometry, material)
@@ -561,6 +571,7 @@ class Home extends Component {
 
   render3d = () => {
     this.renderer && this.renderer.render(this.scene, this.camera)
+    console.log('draw calls:', this.renderer.info.render.calls)
   }
 
 
