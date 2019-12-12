@@ -1,17 +1,17 @@
 export const data = `<?xml version='1.0'?>
 <home version='6000' name='arlington-chien (5).sh3d' camera='topCamera' wallHeight='243.84'>
-  <property name='com.eteks.sweethome3d.SweetHome3D.CatalogPaneDividerLocation' value='695'/>
-  <property name='com.eteks.sweethome3d.SweetHome3D.ColumnWidths' value='24,24,24,25,24'/>
+  <property name='com.eteks.sweethome3d.SweetHome3D.CatalogPaneDividerLocation' value='125'/>
+  <property name='com.eteks.sweethome3d.SweetHome3D.ColumnWidths' value='190,191,190,191,191'/>
   <property name='com.eteks.sweethome3d.SweetHome3D.FrameHeight' value='614'/>
   <property name='com.eteks.sweethome3d.SweetHome3D.FrameMaximized' value='true'/>
   <property name='com.eteks.sweethome3d.SweetHome3D.FrameWidth' value='1033'/>
   <property name='com.eteks.sweethome3d.SweetHome3D.FrameX' value='124'/>
   <property name='com.eteks.sweethome3d.SweetHome3D.FrameY' value='50'/>
-  <property name='com.eteks.sweethome3d.SweetHome3D.MainPaneDividerLocation' value='143'/>
-  <property name='com.eteks.sweethome3d.SweetHome3D.PlanPaneDividerLocation' value='976'/>
-  <property name='com.eteks.sweethome3d.SweetHome3D.PlanScale' value='0.16706051'/>
-  <property name='com.eteks.sweethome3d.SweetHome3D.PlanViewportX' value='788'/>
-  <property name='com.eteks.sweethome3d.SweetHome3D.PlanViewportY' value='1345'/>
+  <property name='com.eteks.sweethome3d.SweetHome3D.MainPaneDividerLocation' value='975'/>
+  <property name='com.eteks.sweethome3d.SweetHome3D.PlanPaneDividerLocation' value='999'/>
+  <property name='com.eteks.sweethome3d.SweetHome3D.PlanScale' value='1.1552124'/>
+  <property name='com.eteks.sweethome3d.SweetHome3D.PlanViewportX' value='5839'/>
+  <property name='com.eteks.sweethome3d.SweetHome3D.PlanViewportY' value='18723'/>
   <property name='com.eteks.sweethome3d.SweetHome3D.ScreenHeight' value='1050'/>
   <property name='com.eteks.sweethome3d.SweetHome3D.ScreenWidth' value='1920'/>
   <property name='com.eteks.sweethome3d.swing.HomeComponent3D.detachedView' value='false'/>
@@ -29,7 +29,7 @@ export const data = `<?xml version='1.0'?>
   <backgroundImage image='0' scaleDistance='12000.0' scaleDistanceXStart='585.10004' scaleDistanceYStart='4096.0' scaleDistanceXEnd='5265.9' scaleDistanceYEnd='4096.0' xOrigin='1087.1' yOrigin='5689.8'/>
   <compass x='-100.0' y='50.0' diameter='100.0' northDirection='0.0' longitude='1.7543468' latitude='0.23998277' timeZone='Asia/Bangkok'/>
   <observerCamera attribute='observerCamera' lens='PINHOLE' x='50.0' y='50.0' z='170.0' yaw='5.4977875' pitch='0.19634955' fieldOfView='1.0995575' time='1575460800000'/>
-  <camera attribute='topCamera' lens='PINHOLE' x='4858.1655' y='6432.9165' z='2405.039' yaw='65.92288' pitch='1.2799993' fieldOfView='1.0995575' time='1575460800000'/>
+  <camera attribute='topCamera' lens='PINHOLE' x='3184.0933' y='11779.712' z='2667.039' yaw='65.92288' pitch='1.2799993' fieldOfView='1.0995575' time='1575460800000'/>
   <doorOrWindow catalogId='eTeks#door' name='Door' creator='eTeks' model='2' icon='1' x='3106.7854' y='9219.594' angle='1.5707964' width='74.0' depth='58.420746' height='208.3' modelMirrored='true' modelSize='14086' movable='false' dropOnTopElevation='-0.004801229' wallThickness='0.5135228' wallDistance='0.0684697' cutOutShape='M0,0 v1 h1 v-1 z' wallCutOutOnBothSides='true'>
     <sash xAxis='0.054680664' yAxis='0.5819925' width='0.89129484' startAngle='0.0' endAngle='-1.5707964'/>
     <textStyle attribute='nameStyle' fontSize='57.0'/>
@@ -1488,6 +1488,41 @@ export const data = `<?xml version='1.0'?>
     <sash xAxis='0.054680664' yAxis='0.5819925' width='0.89129484' startAngle='0.0' endAngle='-1.5707964'/>
     <textStyle attribute='nameStyle' fontSize='57.0'/>
   </doorOrWindow>
+  <pieceOfFurniture name='camera' model='6/camera.obj' icon='5' x='890.53754' y='1437.7103' elevation='200.0' angle='5.2933264' width='10.0' depth='31.739136' height='20.869568' modelSize='49033'/>
+  <pieceOfFurniture name='camera' model='6/camera.obj' icon='5' x='1494.132' y='807.56036' elevation='200.0' angle='5.6476917' width='10.0' depth='31.739136' height='20.869568' modelSize='49033'/>
+  <pieceOfFurniture name='camera' model='6/camera.obj' icon='5' x='2994.921' y='834.44366' elevation='200.0' angle='1.5707964' width='2.3' depth='7.3' depthInPlan='7.2999997' height='4.8' modelSize='49033'/>
+  <pieceOfFurniture name='camera' model='6/camera.obj' icon='5' x='3282.417' y='522.7387' elevation='200.0' width='10.0' depth='31.739136' height='20.869568' modelSize='49033'/>
+  <pieceOfFurniture name='camera' model='6/camera.obj' icon='5' x='3640.6934' y='1883.6575' elevation='200.0' width='10.0' depth='31.739136' height='20.869568' modelSize='49033'/>
+  <pieceOfFurniture name='camera' model='6/camera.obj' icon='5' x='3559.786' y='2021.9946' elevation='200.0' angle='4.712389' width='10.0' depth='31.739136' height='20.869568' modelSize='49033'/>
+  <pieceOfFurniture name='camera' model='6/camera.obj' icon='5' x='3161.7415' y='2053.896' elevation='200.0' angle='4.712389' width='10.0' depth='31.739136' height='20.869568' modelSize='49033'/>
+  <pieceOfFurniture name='camera' model='6/camera.obj' icon='5' x='3161.786' y='2412.1724' elevation='200.0' angle='4.712389' width='10.0' depth='31.739136' height='20.869568' modelSize='49033'/>
+  <pieceOfFurniture name='camera' model='6/camera.obj' icon='5' x='2705.7393' y='1923.1465' elevation='200.0' width='10.0' depth='31.739136' height='20.869568' modelSize='49033'/>
+  <pieceOfFurniture name='camera' model='6/camera.obj' icon='5' x='2119.2456' y='3060.2764' elevation='200.0' width='10.0' depth='31.739136' height='20.869568' modelSize='49033'/>
+  <pieceOfFurniture name='camera' model='6/camera.obj' icon='5' x='1967.9587' y='2664.9287' elevation='200.0' angle='1.5707964' width='10.0' depth='31.739136' height='20.869568' modelSize='49033'/>
+  <pieceOfFurniture name='camera' model='6/camera.obj' icon='5' x='1221.8176' y='3128.7246' elevation='200.0' angle='1.5707964' width='10.0' depth='31.739136' height='20.869568' modelSize='49033'/>
+  <pieceOfFurniture name='camera' model='6/camera.obj' icon='5' x='1634.0972' y='3683.957' elevation='200.0' angle='4.712389' width='10.0' depth='31.739136' height='20.869568' modelSize='49033'/>
+  <pieceOfFurniture name='camera' model='6/camera.obj' icon='5' x='1634.0972' y='4275.3584' elevation='200.0' angle='4.712389' width='10.0' depth='31.739136' height='20.869568' modelSize='49033'/>
+  <pieceOfFurniture name='camera' model='6/camera.obj' icon='5' x='1634.0972' y='4876.576' elevation='200.0' angle='4.712389' width='10.0' depth='31.739136' height='20.869568' modelSize='49033'/>
+  <pieceOfFurniture name='camera' model='6/camera.obj' icon='5' x='1272.3452' y='5405.8047' elevation='200.0' angle='4.712389' width='10.0' depth='31.739136' height='20.869568' modelSize='49033'/>
+  <pieceOfFurniture name='camera' model='6/camera.obj' icon='5' x='462.22638' y='6259.7783' elevation='200.0' angle='4.712389' width='10.0' depth='31.739136' height='20.869568' modelSize='49033'/>
+  <pieceOfFurniture name='camera' model='6/camera.obj' icon='5' x='1232.6061' y='5343.573' elevation='200.0' angle='1.5707964' width='10.0' depth='31.739136' height='20.869568' modelSize='49033'/>
+  <pieceOfFurniture name='camera' model='6/camera.obj' icon='5' x='2716.566' y='6206.801' elevation='200.0' angle='1.5707964' width='10.0' depth='31.739136' height='144.0' modelSize='49033'/>
+  <pieceOfFurniture name='camera' model='6/camera.obj' icon='5' x='2949.5054' y='5692.7236' elevation='200.0' width='10.0' depth='31.739136' height='144.0' modelSize='49033'/>
+  <pieceOfFurniture name='camera' model='6/camera.obj' icon='5' x='3232.648' y='6798.203' elevation='200.0' angle='1.5707964' width='10.0' depth='31.739136' height='144.0' modelSize='49033'/>
+  <pieceOfFurniture name='camera' model='6/camera.obj' icon='5' x='447.90063' y='6862.006' elevation='200.0' angle='4.712389' width='10.0' depth='31.739136' height='144.0' modelSize='49033'/>
+  <pieceOfFurniture name='camera' model='6/camera.obj' icon='5' x='3428.026' y='7816.304' elevation='200.0' angle='3.1415927' width='10.0' depth='31.739136' height='144.0' modelSize='49033'/>
+  <pieceOfFurniture name='camera' model='6/camera.obj' icon='5' x='3317.5981' y='8336.657' elevation='200.0' width='10.0' depth='31.739136' height='144.0' modelSize='49033'/>
+  <pieceOfFurniture name='camera' model='6/camera.obj' icon='5' x='4926.9336' y='6977.3413' elevation='200.0' angle='4.712389' width='10.0' depth='31.739136' height='144.0' modelSize='49033'/>
+  <pieceOfFurniture name='camera' model='6/camera.obj' icon='5' x='3147.8647' y='9113.533' elevation='200.0' angle='4.712389' width='10.0' depth='31.739136' height='144.0' modelSize='49033'/>
+  <pieceOfFurniture name='camera' model='6/camera.obj' icon='5' x='3213.3354' y='9636.085' elevation='200.0' angle='3.1415927' width='10.0' depth='31.739136' depthInPlan='31.73914' height='144.0' modelSize='49033'/>
+  <pieceOfFurniture name='camera' model='6/camera.obj' icon='5' x='4038.0923' y='9682.765' elevation='200.0' angle='1.7484555E-7' width='10.0' depth='31.739136' depthInPlan='31.73914' height='144.0' modelSize='49033'/>
+  <pieceOfFurniture name='camera' model='6/camera.obj' icon='5' x='5448.882' y='9446.722' elevation='200.0' angle='3.1415927' width='10.0' depth='31.739136' depthInPlan='31.73914' height='144.0' modelSize='49033'/>
+  <pieceOfFurniture name='camera' model='6/camera.obj' icon='5' x='3147.8647' y='11063.838' elevation='200.0' angle='4.712389' width='10.0' depth='31.739136' depthInPlan='31.73914' height='144.0' modelSize='49033'/>
+  <pieceOfFurniture name='camera' model='6/camera.obj' icon='5' x='3147.8647' y='10169.493' elevation='200.0' angle='4.712389' width='10.0' depth='31.739136' depthInPlan='31.73914' height='144.0' modelSize='49033'/>
+  <pieceOfFurniture name='camera' model='6/camera.obj' icon='5' x='3652.0928' y='12083.458' elevation='200.0' angle='3.1415927' width='10.0' depth='31.739136' depthInPlan='31.73914' height='144.0' modelSize='49033'/>
+  <pieceOfFurniture name='camera' model='6/camera.obj' icon='5' x='4593.7583' y='11558.828' elevation='200.0' angle='1.5707964' width='10.0' depth='31.739136' depthInPlan='31.73914' height='144.0' modelSize='49033'/>
+  <pieceOfFurniture name='camera' model='6/camera.obj' icon='5' x='5187.8403' y='11129.352' elevation='200.0' angle='4.712389' width='10.0' depth='31.739136' depthInPlan='31.73914' height='144.0' modelSize='49033'/>
+  <pieceOfFurniture name='camera' model='6/camera.obj' icon='5' x='6363.623' y='12083.458' elevation='200.0' angle='3.1415927' width='10.0' depth='31.739136' depthInPlan='31.73914' height='144.0' modelSize='49033'/>
   <wall id='wall0' wallAtStart='wall4' wallAtEnd='wall1' xStart='267.93735' yStart='5642.853' xEnd='268.45505' yEnd='5130.0107' height='243.84' thickness='32.0' pattern='hatchUp'/>
   <wall id='wall1' wallAtStart='wall0' wallAtEnd='wall2' xStart='268.45505' yStart='5130.0107' xEnd='422.50812' yEnd='5130.0107' height='243.84' thickness='32.0' pattern='hatchUp'/>
   <wall id='wall2' wallAtStart='wall1' xStart='422.50812' yStart='5130.0107' xEnd='422.50818' yEnd='3443.4277' height='243.84' thickness='35.0' pattern='hatchUp'/>
