@@ -50,7 +50,7 @@ export default _this => {
       if(room.textStyle) {
         const nameStyle = room.textStyle.find(style => style._attributes.attribute === 'nameStyle')
         const fontSize = parseFloat(nameStyle._attributes.fontSize)
-        console.log('fontSize', fontSize)
+        // console.log('fontSize', fontSize)
         textSize =  50 / 76 * fontSize
       }
 
