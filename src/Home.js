@@ -3,10 +3,8 @@ import * as THREE from 'three'
 import {MapControls} from 'three/examples/jsm/controls/OrbitControls'
 import {BufferGeometryUtils} from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import {OBJLoader} from 'three/examples/jsm/loaders/OBJLoader.js'
-import {SVGLoader} from 'three/examples/jsm/loaders/SVGLoader.js'
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js'
-import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js';
-import stat from 'three/examples/jsm/libs/stats.module.js';
+import stat from 'three/examples/jsm/libs/stats.module.js'
 
 const ThreeBSP = require('three-js-csg')(THREE)
 
@@ -62,8 +60,8 @@ class Home extends Component {
     const ambientLight = new THREE.AmbientLight(0xcccccc, 0.7)
 
     this.drawWall(group)
-    this.drawRoom()
-    this.drawCamera(group)
+    // this.drawRoom()
+    // this.drawCamera(group)
     // this.drawWallItems(group)
     // this.drawExample(group)
 
@@ -143,107 +141,159 @@ class Home extends Component {
     const topMesh = new THREE.Mesh(topGeos, material2)
     topMesh.rotation.x = Math.PI / 2
     topMesh.position.y = 2
-    // this.scene.add(topMesh)
     const mergedWallGeometry = BufferGeometryUtils.mergeBufferGeometries(wallGeometries, false)
     const mesh = new THREE.Mesh(mergedWallGeometry, material)
+    mesh.rotation.x = Math.PI / 2
+    this.scene.add(topMesh)
+    this.scene.add(mesh)
+    const doorGeometry = new THREE.BoxBufferGeometry(1, 1, 1)
+    const doorMaterial = new THREE.MeshBasicMaterial({
+      color: 0x559398,
+      transparent: false,
+      opacity: 0.5,
+      side: THREE.DoubleSide
+    })
+    const doorMesh = new THREE.InstancedMesh( doorGeometry, doorMaterial, data.home.doorOrWindow.length );
+    doorMesh.frustumCulled = false
+    const transform = new THREE.Object3D();
+    transform.rotateX(Math.PI / 2)
 
+    data.home.doorOrWindow && data.home.doorOrWindow.forEach((item, index) => {
+      const {_attributes: hole} = item
+      const x = parseFloat(hole.x)
+      const y = parseFloat(hole.y)
+      const width = parseFloat(hole.width)
+      const height = parseFloat(hole.height)
+      const depth = parseFloat(hole.depth)
+      const angle = parseFloat(hole.angle)
+      transform.position.set( x, y, 200);
+      transform.scale.set(width - 5, height, depth + 10)
+      transform.rotateY(angle || 0)
+      transform.updateMatrix();
+      doorMesh.setMatrixAt(index, transform.matrix);
+      transform.rotateY(-angle || 0)
+      // const {_attributes: hole} = item
+      // const x = parseFloat(hole.x, 10)
+      // const y = parseFloat(hole.y, 10)
+      // const width = parseFloat(hole.width, 10)
+      // const height = parseFloat(hole.height, 10)
+      // const depth = parseFloat(hole.depth, 10)
+      // const angle = parseFloat(hole.angle, 10)
+      // const holeGeometry = new THREE.BoxBufferGeometry(1, 1, 1)
+      // const holeCube = new THREE.Mesh(holeGeometry, new THREE.MeshBasicMaterial({
+      //   color: 0x559398,
+      //   transparent: false,
+      //   opacity: 0.5
+      // }))
+      // // const holeCube2 = new THREE.Mesh(holeGeometry, new THREE.MeshBasicMaterial({color: 0x559398, transparent: true, opacity: 0.5}))
+      // holeCube.rotateX(-Math.PI / 2)
+      // holeCube.scale.set(width - 5, height, depth + 10)
+      // holeCube.rotateY(-angle || 0)
+      // holeCube.position.x = x
+      // holeCube.position.y = y
+      // holeCube.position.z = 140
+      // group.add(holeCube)
+    })
+
+    // doorMesh.rotateX(-Math.PI / 2)
+    group.add(doorMesh)
 
     // make holes in the walls
-    const manager = new THREE.LoadingManager()
-    const mtlLoader = new MTLLoader( manager )
-    const objLoader = new OBJLoader( )
-    const svgLoader = new SVGLoader()
-    mtlLoader.load('/models/obj/Door/door.mtl', materials => {
-      console.log('door ,tl;', materials)
-      materials.preload();
-      objLoader
-        .setMaterials( materials )
-        .setPath( '/models/obj/' )
-        .load( 'Door/door.obj', doorObject => {
-          console.log('door', doorObject)
-          doorObject.rotateX(-Math.PI/2)
-          doorObject.children[2].material = new THREE.MeshBasicMaterial({color: 0x999999})
-
-          svgLoader.load( '/lock.svg', ( svgData ) => {
-            const path = svgData.paths[0]
-            const shape = path.toShapes(false)
-            const svgGeometry = new THREE.ExtrudeBufferGeometry(shape, {depth: 150, bevelEnabled: false,})
-            const svgMesh = new THREE.Mesh(svgGeometry, new THREE.MeshBasicMaterial({color: 0x990000}))
-            svgMesh.rotateX(Math.PI)
-            svgMesh.scale.set(0.05, 0.05, 0.05)
-            // this.scene.add( svgMesh );
-
-
-            let mesh2 = new THREE.Mesh(mergedGeo, material)
-            // let totalBSP = new ThreeBSP(mesh2)
-            data.home.doorOrWindow && data.home.doorOrWindow.forEach((item, index) => {
-              const {_attributes: hole} = item
-              const x = parseFloat(hole.x, 10)
-              const y = parseFloat(hole.y, 10)
-              const width = parseFloat(hole.width, 10)
-              const height = parseFloat(hole.height, 10)
-              const depth = parseFloat(hole.depth, 10)
-              const angle = parseFloat(hole.angle, 10)
-              const holeGeometry = new THREE.BoxGeometry(1, 1, 1)
-              const holeCube = new THREE.Mesh(holeGeometry, new THREE.MeshBasicMaterial({color: 0x559398, transparent: false, opacity: 0.5}))
-              // const holeCube2 = new THREE.Mesh(holeGeometry, new THREE.MeshBasicMaterial({color: 0x559398, transparent: true, opacity: 0.5}))
-              holeCube.rotateX(-Math.PI / 2)
-              holeCube.scale.set(width - 5, height, depth + 10)
-              holeCube.rotateY(-angle || 0)
-              holeCube.position.x = x
-              holeCube.position.y = y
-              holeCube.position.z = 140
-              group.add(holeCube)
-              // const holdeMesh =
-
-
-              // const cloneDoorObject = doorObject.clone()
-              // const cloneLockModel = svgMesh.clone()
-              // const groupTemp = new THREE.Group()
-              // groupTemp.rotateX(-Math.PI / 2)
-              // groupTemp.rotateY(-angle || 0)
-              // groupTemp.position.x = x
-              // groupTemp.position.y = y
-              // groupTemp.position.z = 140
-              // groupTemp.add(holeCube2)
-              // groupTemp.add(cloneDoorObject)
-              // if (index % 3 === 0) {
-              //   cloneDoorObject.children[0].rotateZ(-Math.PI/3)
-              //   cloneDoorObject.children[0].translateY(-45)
-              //   cloneDoorObject.children[0].translateX(30)
-              //
-              //   cloneDoorObject.children[1].rotateZ(-Math.PI/3)
-              //   cloneDoorObject.children[1].translateY(-45)
-              //   cloneDoorObject.children[1].translateX(30)
-              //   cloneDoorObject.children[1].translateX(30)
-              //
-              //   cloneDoorObject.children[3].rotateZ(-Math.PI/3)
-              //   cloneDoorObject.children[3].translateY(-45)
-              //   cloneDoorObject.children[3].translateX(30)
-              // }
-              // else if(index % 5 === 0) {
-              //   cloneLockModel.translateX(-10)
-              //   cloneLockModel.translateZ(-3)
-              //   groupTemp.add(cloneLockModel)
-              // }
-
-              // group.add(groupTemp)
-
-              // const doorHole = new ThreeBSP(holeCube)
-              // const subtractBSP = totalBSP.subtract(doorHole)
-              // if (subtractBSP.tree.polygons.length) {
-              //   totalBSP = subtractBSP
-              // }
-            })
-            // const newMesh = totalBSP.toMesh(material)
-            // group.add(newMesh)
-            group.add(mesh2)
-            // make holes in the walls
-            // make holes in the walls
-          })
-
-        });
-    })
+    // const manager = new THREE.LoadingManager()
+    // const mtlLoader = new MTLLoader( manager )
+    // const objLoader = new OBJLoader( )
+    // const svgLoader = new SVGLoader()
+    // mtlLoader.load('/models/obj/Door/door.mtl', materials => {
+    //   console.log('door ,tl;', materials)
+    //   materials.preload();
+    //   objLoader
+    //     .setMaterials( materials )
+    //     .setPath( '/models/obj/' )
+    //     .load( 'Door/door.obj', doorObject => {
+    //       console.log('door', doorObject)
+    //       doorObject.rotateX(-Math.PI/2)
+    //       doorObject.children[2].material = new THREE.MeshBasicMaterial({color: 0x999999})
+    //
+    //       svgLoader.load( '/lock.svg', ( svgData ) => {
+    //         const path = svgData.paths[0]
+    //         const shape = path.toShapes(false)
+    //         const svgGeometry = new THREE.ExtrudeBufferGeometry(shape, {depth: 150, bevelEnabled: false,})
+    //         const svgMesh = new THREE.Mesh(svgGeometry, new THREE.MeshBasicMaterial({color: 0x990000}))
+    //         svgMesh.rotateX(Math.PI)
+    //         svgMesh.scale.set(0.05, 0.05, 0.05)
+    //         // this.scene.add( svgMesh );
+    //
+    //
+    //         let mesh2 = new THREE.Mesh(mergedGeo, material)
+    //         // let totalBSP = new ThreeBSP(mesh2)
+    //         data.home.doorOrWindow && data.home.doorOrWindow.forEach((item, index) => {
+    //           const {_attributes: hole} = item
+    //           const x = parseFloat(hole.x, 10)
+    //           const y = parseFloat(hole.y, 10)
+    //           const width = parseFloat(hole.width, 10)
+    //           const height = parseFloat(hole.height, 10)
+    //           const depth = parseFloat(hole.depth, 10)
+    //           const angle = parseFloat(hole.angle, 10)
+    //           const holeGeometry = new THREE.BoxGeometry(1, 1, 1)
+    //           const holeCube = new THREE.Mesh(holeGeometry, new THREE.MeshBasicMaterial({color: 0x559398, transparent: false, opacity: 0.5}))
+    //           // const holeCube2 = new THREE.Mesh(holeGeometry, new THREE.MeshBasicMaterial({color: 0x559398, transparent: true, opacity: 0.5}))
+    //           holeCube.rotateX(-Math.PI / 2)
+    //           holeCube.scale.set(width - 5, height, depth + 10)
+    //           holeCube.rotateY(-angle || 0)
+    //           holeCube.position.x = x
+    //           holeCube.position.y = y
+    //           holeCube.position.z = 140
+    //           group.add(holeCube)
+    //           // const holdeMesh =
+    //
+    //
+    //           // const cloneDoorObject = doorObject.clone()
+    //           // const cloneLockModel = svgMesh.clone()
+    //           // const groupTemp = new THREE.Group()
+    //           // groupTemp.rotateX(-Math.PI / 2)
+    //           // groupTemp.rotateY(-angle || 0)
+    //           // groupTemp.position.x = x
+    //           // groupTemp.position.y = y
+    //           // groupTemp.position.z = 140
+    //           // groupTemp.add(holeCube2)
+    //           // groupTemp.add(cloneDoorObject)
+    //           // if (index % 3 === 0) {
+    //           //   cloneDoorObject.children[0].rotateZ(-Math.PI/3)
+    //           //   cloneDoorObject.children[0].translateY(-45)
+    //           //   cloneDoorObject.children[0].translateX(30)
+    //           //
+    //           //   cloneDoorObject.children[1].rotateZ(-Math.PI/3)
+    //           //   cloneDoorObject.children[1].translateY(-45)
+    //           //   cloneDoorObject.children[1].translateX(30)
+    //           //   cloneDoorObject.children[1].translateX(30)
+    //           //
+    //           //   cloneDoorObject.children[3].rotateZ(-Math.PI/3)
+    //           //   cloneDoorObject.children[3].translateY(-45)
+    //           //   cloneDoorObject.children[3].translateX(30)
+    //           // }
+    //           // else if(index % 5 === 0) {
+    //           //   cloneLockModel.translateX(-10)
+    //           //   cloneLockModel.translateZ(-3)
+    //           //   groupTemp.add(cloneLockModel)
+    //           // }
+    //
+    //           // group.add(groupTemp)
+    //
+    //           // const doorHole = new ThreeBSP(holeCube)
+    //           // const subtractBSP = totalBSP.subtract(doorHole)
+    //           // if (subtractBSP.tree.polygons.length) {
+    //           //   totalBSP = subtractBSP
+    //           // }
+    //         })
+    //         // const newMesh = totalBSP.toMesh(material)
+    //         // group.add(newMesh)
+    //         group.add(mesh2)
+    //         // make holes in the walls
+    //         // make holes in the walls
+    //       })
+    //
+    //     });
+    // })
 
   }
 
@@ -381,7 +431,16 @@ class Home extends Component {
         box.setFromObject(roomMesh)
         const center = box.getCenter()
 
-        const fontShape = font.generateShapes( _attributes.name || 'No name', 50 );
+        let textSize = 50
+
+        if(room.textStyle) {
+          const nameStyle = room.textStyle.find(style => style._attributes.attribute === 'nameStyle')
+          const fontSize = parseFloat(nameStyle._attributes.fontSize)
+          console.log('fontSize', fontSize)
+          textSize =  50 / 76 * fontSize
+        }
+
+        const fontShape = font.generateShapes( _attributes.name || '', textSize );
 
         const fontGeometry = new THREE.ShapeBufferGeometry(fontShape)
         const text = new THREE.Mesh( fontGeometry, fontMaterial );
@@ -404,6 +463,7 @@ class Home extends Component {
         text.position.z = center.y - deltaZ + (_attributes.nameYOffset ? parseFloat(_attributes.nameYOffset) : 0)
 
         if(_attributes.name === 'West Vestibule') {
+          console.log('room', room)
           console.log(_attributes.name )
           console.log('textBox', textBox)
           console.log('deltaX', deltaX)
