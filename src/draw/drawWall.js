@@ -1,12 +1,16 @@
 import * as THREE from 'three'
 import {BufferGeometryUtils} from 'three/examples/jsm/utils/BufferGeometryUtils.js'
+import {wallDept} from '../config'
 
 export default _this => {
   const {data} = _this.props
+  const {home} = data
+  if (!home.wall) return
+  if (home.wall._attributes) home.wall = [home.wall]
   const {group} = _this
   const extrudeSettings = {
     steps: 1,
-    depth: 300,
+    depth: wallDept,
     bevelEnabled: false
   }
   const material = new THREE.MeshPhongMaterial({
@@ -22,7 +26,7 @@ export default _this => {
   const material2 = new THREE.MeshPhongMaterial({
     color: 0x000000,
     specular: 0x666666,
-    emissive: 0x333333,
+    emissive: 0xaaa9aa,
     shininess: 3,
     opacity: 0.95,
     transparent: false
@@ -30,7 +34,7 @@ export default _this => {
 
   const topGeo = []
   let mergedGeo = new THREE.Geometry()
-  const wallGeometries = data.home.wall.map(wall => {
+  const wallGeometries = home.wall.map(wall => {
     const {_attributes} = wall
     const shape = new THREE.Shape()
     const xStart = parseFloat(_attributes.xStart)
@@ -52,17 +56,18 @@ export default _this => {
     shape.lineTo(xEnd + deltaX, yEnd + deltaY)
     shape.lineTo(xStart + deltaX, yStart + deltaY)
     shape.lineTo(xStart - deltaX, yStart - deltaY)
-    topGeo.push(new THREE.ExtrudeBufferGeometry(shape, {...setting, depth: 2}))
+    // topGeo.push(new THREE.ExtrudeBufferGeometry(shape, {...setting, depth: 2}))
     mergedGeo.merge(new THREE.ExtrudeGeometry(shape, setting))
     return new THREE.ExtrudeBufferGeometry(shape, setting)
   })
-  const topGeos = BufferGeometryUtils.mergeBufferGeometries(topGeo, false)
-  const topMesh = new THREE.Mesh(topGeos, material2)
-  topMesh.rotation.x = Math.PI / 2
-  topMesh.position.y = 2
+  // const topGeos = BufferGeometryUtils.mergeBufferGeometries(topGeo, false)
+  // const topMesh = new THREE.Mesh(topGeos, material2)
+  // topMesh.rotation.x = Math.PI / 2
+  // topMesh.position.y = 2
   const mergedWallGeometry = BufferGeometryUtils.mergeBufferGeometries(wallGeometries, false)
   const mesh = new THREE.Mesh(mergedWallGeometry, material)
   mesh.rotation.x = Math.PI / 2
-  _this.scene.add(topMesh)
+  mesh.position.y = - wallDept
+  // _this.scene.add(topMesh)
   _this.scene.add(mesh)
 }

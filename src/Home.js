@@ -6,6 +6,7 @@ import drawCamera from './draw/drawCamera'
 import drawRoom from './draw/drawRoom'
 import drawWall from './draw/drawWall'
 import drawDoor from './draw/drawDoor'
+import {wallDept} from './config'
 
 const ThreeBSP = require('three-js-csg')(THREE)
 
@@ -25,7 +26,7 @@ class Home extends Component {
     this.init()
     this.animate()
     this.controls = new MapControls(this.camera, this.renderer.domElement)
-    this.controls.maxDistance = 4000
+    this.controls.maxDistance = 8000
     this.controls.minDistance = 100
     this.controls.maxPolarAngle = 1.0341655727265222
     this.controls.minPolarAngle = 1.0341655727265222
@@ -48,10 +49,10 @@ class Home extends Component {
     this.group = new THREE.Group()
     this.group.rotateX(Math.PI / 2)
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.2)
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5)
 
     directionalLight.position.set(0.75, 0.75, 3.0).normalize()
-    const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.4)
+    const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.7)
 
     directionalLight2.position.set(0.75, -0.75, 3.0).normalize()
     const ambientLight = new THREE.AmbientLight(0xcccccc, 0.7)
@@ -75,7 +76,7 @@ class Home extends Component {
   drawMap = () => {
     const groundMaterial = new THREE.MeshBasicMaterial({color: 0xcccccc})
     const mesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(60000, 60000), groundMaterial)
-    mesh.position.y = -252
+    mesh.position.y = -wallDept * 2 - 7
     mesh.rotation.x = -Math.PI / 2
     mesh.receiveShadow = true
     this.scene.add(mesh)
@@ -96,7 +97,7 @@ class Home extends Component {
 
   render3d = () => {
     this.renderer && this.renderer.render(this.scene, this.camera)
-    console.log('draw calls:', this.renderer.info.render.calls)
+    // console.log('draw calls:', this.renderer.info.render.calls)
   }
 
   render () {

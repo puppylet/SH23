@@ -1,19 +1,15 @@
 import * as THREE from 'three'
 import {BufferGeometryUtils} from 'three/examples/jsm/utils/BufferGeometryUtils.js'
+import {wallDept} from '../config'
 export default _this => {
   const {data} = _this.props
   const group = _this.scene
+  const {home} = data
   if (!data.home.room) return
   const loader = new THREE.FontLoader();
   loader.load('/fonts/helvetiker_regular.typeface.json', font => {
-    const material = new THREE.MeshPhongMaterial({
-      color: 0x000000,
-      specular: 0x666666,
-      emissive: 0x777777,
-      shininess: 3,
-      opacity: 0.95,
-      // wireframe: true,
-      transparent: false
+    const material = new THREE.MeshBasicMaterial({
+      color: 0x999999
     })
     const extrudeSettings = {
       steps: 1,
@@ -28,7 +24,10 @@ export default _this => {
 
     const singleTextGeometry = new THREE.Geometry()
 
-    const roomGeometries = data.home.room.map(room => {
+    if (!home.room) home.room = []
+    if (home.room._attributes) home.room = [home.room]
+
+    const roomGeometries = home.room.map(room => {
       const {point, _attributes = {}} = room
       const shape = new THREE.Shape()
       point.map((p, index) => {
@@ -45,7 +44,7 @@ export default _this => {
       box.setFromObject(roomMesh)
       const center = box.getCenter()
 
-      let textSize = 50
+      let textSize = 18
 
       if(room.textStyle) {
         const nameStyle = room.textStyle.find(style => style._attributes.attribute === 'nameStyle')
@@ -65,7 +64,7 @@ export default _this => {
 
       text.position.x = center.x + (_attributes.nameXOffset ? parseFloat(_attributes.nameXOffset) : 0)
       text.position.z = center.y + (_attributes.nameYOffset ? parseFloat(_attributes.nameYOffset) : 0)
-      text.position.y = -245
+      text.position.y = -2*wallDept
 
       const textBox  = new THREE.Box3().setFromObject(text)
 
@@ -105,7 +104,7 @@ export default _this => {
     const mergedRoomGeometry = BufferGeometryUtils.mergeBufferGeometries(roomGeometries, false)
     const mesh = new THREE.Mesh(mergedRoomGeometry, material)
     mesh.rotation.x = Math.PI / 2
-    mesh.position.y = -248
+    mesh.position.y = -2 * wallDept - 2
     mesh.receiveShadow = true
     group.add(mesh)
   })
